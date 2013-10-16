@@ -159,8 +159,8 @@ Global Arguments isequiv_precompose {_} [A B] C f {_}.
 
 (*
 TODO (low): also consider/try changing arguments as follows:
-Arguments isequiv_cancelL [B C] g {ge} [A] f {fge} : rename.
-Arguments isequiv_cancelR [A B] f {fe} [C] g {gfe}.
+Arguments cancelL_isequiv [B C] g {ge} [A] f {fge} : rename.
+Arguments cancelR_isequiv [A B] f {fe} [C] g {gfe}.
 
 Also: consider changing the order of their arguments; and *definitely* try making them not instances.
 *)

@@ -219,11 +219,11 @@ Definition equiv_two_of_three_composite {X Y Z : Type} (f: X -> Y) (g: Y -> Z)
 
 Definition equiv_two_of_three_left {X Y Z : Type} (f: X -> Y) (g: Y -> Z)
   : IsEquiv f -> IsEquiv (g o f) -> IsEquiv g
-:= (fun _ _ => isequiv_cancelR g).
+:= (fun _ _ => Equivalences.cancelR_isequiv g).
 
 Definition equiv_two_of_three_right {X Y Z : Type} (f: X -> Y) (g: Y -> Z)
   : IsEquiv g -> IsEquiv (g o f) -> IsEquiv f
-:= (fun _ _ => isequiv_cancelL f).
+:= (fun _ _ => Equivalences.cancelL_isequiv f).
 
 (*******************************************************************************
 2 out of 6: a strengthening of the 2 out of 3 property,

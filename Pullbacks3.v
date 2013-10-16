@@ -268,7 +268,7 @@ Proof.
   apply top_cospan_cone_to_composite_isequiv.
   (* <- *)
   intros C3_UP X.
-  apply (@isequiv_cancelL _ _ (top_cospan_cone_to_composite P1)
+  apply (@cancelL_isequiv _ _ (top_cospan_cone_to_composite P1)
     (top_cospan_cone_to_composite_isequiv _ _) _ (map_to_cospan_cone C2 X)).
   change (top_cospan_cone_to_composite P1 o (map_to_cospan_cone C2 X))
   with (map_to_cospan_cone (top_cospan_cone_to_composite P1 C2) X).
