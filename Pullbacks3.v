@@ -252,7 +252,7 @@ Proof.
   apply composite_cospan_cone_to_top_is_retraction.
 Qed.
 
-Lemma abstract_two_pullback_lemma
+Lemma abstract_two_pullbacks_lemma
   (P1 : abstract_pullback f g)
   {P2 : Type} (C2 : cospan_cone (cospan_cone_map2 P1) h P2)
 : is_pullback_cone C2 <-> is_pullback_cone (top_cospan_cone_to_composite P1 C2).
