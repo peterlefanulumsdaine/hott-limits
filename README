@@ -1,0 +1,34 @@
+ 
+To use the files in this directory, you need to have a version of Coq suitable for use with homotopy type theory, as well as the homotopy type theory library. To obtain both of these, follow the directions in the README file here:
+
+  https://github.com/HoTT/HoTT
+  
+Assuming hoqc is in the system path, typing the command
+
+  make
+
+in the directory with these files will then compile most of the source files, 
+
+  make all
+  
+will compile all of them, and
+
+  make sequences
+  make limits
+  
+will compile everything except for Pullbacks3.v, which takes a long time.
+
+Assuming hoqtop is in the system path, you can then explore the files using Proof General or the Coq IDE.
+
+These files have been tested under the following version of the HoTT library:
+
+  ccf55c60b90404611f1dd377a4e47a12fae08c05
+  
+We used the following version of Coq 8.4:
+
+  0e7800c3f9fbb7313c8f1ad194e8163988ec6ecd
+  
+This library may evolve in the future. For the current version, look here:
+
+  https://github.com/peterlefanulumsdaine/hott-limits
+  
