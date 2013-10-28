@@ -271,9 +271,9 @@ Limits over the natural numbers.
 
 *******************************************************************************)
 
-Section Limits_Preserve_HLevels.
+Section Trunc_Limits_Preserve_Trunc.
 
-Lemma limits_preserve_hlevels {G : graph} {D : diagram G} {n : nat}
+Lemma trunc_limits_preserve_trunc {G : graph} {D : diagram G} {n : nat}
   (hlnD : forall i : G, IsTrunc n (D i))
 : IsTrunc n (limit D).
 Proof.
@@ -285,7 +285,7 @@ Proof.
   intros e. apply trunc_succ.
 Defined.
 
-End Limits_Preserve_HLevels.
+End Trunc_Limits_Preserve_Trunc.
 
 (*
 Local Variables:
