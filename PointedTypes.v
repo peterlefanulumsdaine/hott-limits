@@ -20,33 +20,33 @@ Pointed types.
 *******************************************************************************)
 
 (* TODO (high): consistentize use of capital letters, throughout development *)
-Section PointedTypes.
+Section Pointed_Types.
 
 (* TODO (low): would these be better just as sigma-types, maybe? *)
-Record PointedType := {
-  PT_type :> Type;
-  point : PT_type }.
+Record pointed_type := mk_pointed_type {
+  pt_type :> Type;
+  point : pt_type }.
 
-Record PointedMap (X Y : PointedType) := {
-  PT_map :> X -> Y;
-  PT_map_pt : PT_map (point X) = point Y }.
+Record pointed_map (X Y : pointed_type) := mk_pointed_map {
+  pt_map :> X -> Y;
+  pt_map_pt : pt_map (point X) = point Y }.
 
-Global Arguments PT_map_pt [X Y] f : rename.
-Global Arguments Build_PointedMap [X Y] f alpha : rename.
+Global Arguments pt_map_pt [X Y] f : rename.
+Global Arguments mk_pointed_map [X Y] f alpha : rename.
 
-Definition idmap_ptd (X:PointedType) : PointedMap X X
-:= {| PT_map := idmap ; PT_map_pt := 1 |}.
+Definition idmap_ptd (X : pointed_type) : pointed_map X X
+:= {| pt_map := idmap ; pt_map_pt := 1 |}.
 
 (* TODO (mid): category structure on aps. *)
 
-End PointedTypes.
+End Pointed_Types.
 
-Notation "A .-> B" := (PointedMap A B)
+Notation "A .-> B" := (pointed_map A B)
   (at level 75, right associativity).
 
 (* A quick notation for using aps that *definitionally* preserve
   the point as pointed aps. *)
-Notation "[ 'pointed' f ]" := {| PT_map := f; PT_map_pt := 1 |}
+Notation "[ 'pointed' f ]" := {| pt_map := f; pt_map_pt := 1 |}
   (at level 40).
 
 
@@ -56,24 +56,24 @@ Some examples of pointed types.
 
 *******************************************************************************)
 
-Section PointedTypes_Examples.
+Section Pointed_Types_Examples.
 
-Definition Unit_Ptd : PointedType
-  := Build_PointedType Unit tt.
+Definition Unit_Ptd : pointed_type
+  := mk_pointed_type Unit tt.
 
 Canonical Structure Unit_Ptd.
 
-Definition hfiber_ptd {X Y : PointedType} (f : X .-> Y) : PointedType
-:= Build_PointedType (hfiber f (point Y)) (point X; PT_map_pt f).
+Definition hfiber_ptd {X Y : pointed_type} (f : X .-> Y) : pointed_type
+:= mk_pointed_type (hfiber f (point Y)) (point X; pt_map_pt f).
 
 (* TODO (mid): fix once this issue is cleared up. *)
 (* Canonical Structure hfiber_ptd. *)
 
-Definition hfiber_incl_ptd {X Y : PointedType} (f : X .-> Y)
+Definition hfiber_incl_ptd {X Y : pointed_type} (f : X .-> Y)
   : (hfiber_ptd f) .-> X
-:= @Build_PointedMap (hfiber_ptd f) X (hfiber_incl f (point Y)) 1.
+:= @mk_pointed_map (hfiber_ptd f) X (hfiber_incl f (point Y)) 1.
 
-End PointedTypes_Examples.
+End Pointed_Types_Examples.
 
 
 (*******************************************************************************
@@ -86,27 +86,27 @@ Pullbacks2.v.
 
 Section Omega_Ptd.
 
-Definition Omega_Ptd (A:PointedType) : PointedType
-:= {| PT_type := Omega A (point A);
+Definition Omega_ptd (A:pointed_type) : pointed_type
+:= {| pt_type := Omega A (point A);
       point := idpath (point A) |}.
 
 (* TODO (mid): fix once this issue is cleared up. *)
 (* Canonical Structure Omega_Ptd. *)
 
-Definition Omega_Ptd_fmap {A B : PointedType} (f : A .-> B)
-: (Omega_Ptd A) .-> (Omega_Ptd B).
+Definition Omega_ptd_fmap {A B : pointed_type} (f : A .-> B)
+: (Omega_ptd A) .-> (Omega_ptd B).
 Proof.
-  exists (fun p : Omega_Ptd A => (PT_map_pt f)^ @ ap f p @ PT_map_pt f).
-  path_via ((PT_map_pt f)^ @ PT_map_pt f).
+  exists (fun p : Omega_ptd A => (pt_map_pt f)^ @ ap f p @ pt_map_pt f).
+  path_via ((pt_map_pt f)^ @ pt_map_pt f).
   apply whiskerR, concat_p1.
   apply concat_Vp.
 Defined.
 
-Fixpoint Omega_Ptd_fmap_iterate {A B : PointedType} (f : A .-> B) (n : nat)
-  : (iterate Omega_Ptd n A) .-> (iterate Omega_Ptd n B)
+Fixpoint Omega_ptd_fmap_iterate {A B : pointed_type} (f : A .-> B) (n : nat)
+  : (iterate Omega_ptd n A) .-> (iterate Omega_ptd n B)
 := match n with
     | O => f
-    | (S n') => Omega_Ptd_fmap (Omega_Ptd_fmap_iterate f n')
+    | (S n') => Omega_ptd_fmap (Omega_ptd_fmap_iterate f n')
    end.
 
 End Omega_Ptd.

@@ -92,9 +92,9 @@ Long exact sequence.
 (* TODO (high): make this a pointed equivalence!  Possibly also rewrite this
 to make the underlying ap explicit. *)
 Theorem long_exact_thm
-: forall {X Y : PointedType} (f:Y.->X),
-    (PT_type (hfiber_ptd (hfiber_incl_ptd f)))
-    <~> Omega_Ptd X.
+: forall {X Y : pointed_type} (f:Y.->X),
+    (pt_type (hfiber_ptd (hfiber_incl_ptd f)))
+    <~> Omega_ptd X.
 Proof.
   intros. simpl.
   set (y := point Y). set (x := point X).
@@ -104,7 +104,7 @@ Proof.
     apply hfiber_as_pullback_equiv.
   equiv_via (pullback (name x) (f o name y)). Focus 2.
     assert (f o name y = name x) as name_path.
-      apply path_forall. intros [ ]. apply PT_map_pt.
+      apply path_forall. intros [ ]. apply pt_map_pt.
     rewrite name_path. apply equiv_idmap.
   equiv_via (pullback (f^* (name x)) (name y)). Focus 2.
     apply equiv_inverse. apply two_pullbacks_equiv.
@@ -126,10 +126,10 @@ Proof.
 Defined.
 
 (* We also need to know how this interacts with the functoriality of Omega. *)
-Lemma long_exact_seq_naturality {X Y : PointedType} (f:Y .-> X)
-: Omega_Ptd_fmap f
+Lemma long_exact_seq_naturality {X Y : pointed_type} (f:Y .-> X)
+: Omega_ptd_fmap f
   == (long_exact_thm f)
-     o PT_map _ _ (hfiber_incl_ptd (hfiber_incl_ptd (hfiber_incl_ptd f)))
+     o pt_map _ _ (hfiber_incl_ptd (hfiber_incl_ptd (hfiber_incl_ptd f)))
      o ((long_exact_thm (hfiber_incl_ptd f)) ^-1).
 Proof.
 (*
@@ -150,7 +150,7 @@ Goal of the section: if [X -> Y] has fibers of h-level [n], then
 Corollary loop_space_equiv_from_fiber_hlevel
   {Y X} (f : Y .-> X)
   {n:nat} (Hn : forall x:X, IsTrunc n (hfiber f x))
-: IsEquiv (Omega_Ptd_fmap_iterate f n).
+: IsEquiv (Omega_ptd_fmap_iterate f n).
 Proof.
 Admitted.
 
