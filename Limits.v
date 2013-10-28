@@ -144,21 +144,21 @@ Definition graph_cone (D : diagram G) (X : Type)
 Definition mk_graph_cone {D} {X} tau tau1 : graph_cone D X
 := existT _ tau tau1.
 
-Definition graph_cone_pr1 {D:diagram G} {X} (tau : graph_cone D X)
+Definition graph_cone_pr1 {D : diagram G} {X} (tau : graph_cone D X)
   := pr1 tau.
 Coercion graph_cone_pr1 : graph_cone >-> Funclass.
 
-Definition graph_cone_pr2 {D:diagram G} {X} (tau: graph_cone D X)
+Definition graph_cone_pr2 {D : diagram G} {X} (tau: graph_cone D X)
   {i j} (f : G i j) (x:X)
 := pr2 tau i j f x.
 
-Definition graph_cone_homot {D:diagram G} {X:Type}
+Definition graph_cone_homot {D : diagram G} {X:Type}
   (sigma tau : graph_cone D X)
 := { alpha : forall i, sigma i == tau i
    & forall i j f x, graph_cone_pr2 sigma f x @ alpha j x
                      = ap (D.1 f) (alpha i x) @ graph_cone_pr2 tau f x}.
 
-Definition graph_cone_homot_to_path {D:diagram G} {X:Type}
+Definition graph_cone_homot_to_path {D : diagram G} {X:Type}
   {sigma tau : graph_cone D X} (alpha : graph_cone_homot sigma tau)
 : sigma = tau.
 Proof.
