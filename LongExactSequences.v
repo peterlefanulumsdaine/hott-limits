@@ -141,13 +141,13 @@ Proof.
 Admitted.
 
 (*******************************************************************************
-Application of the LES: loop spaces of spaces compared with hlevels of fibers.
+Application of the LES: equivalence of loop spaces, via truncatedness of fibers.
 
-Goal of the section: if [X -> Y] has fibers of h-level [n], then
+Goal of the section: if [X -> Y] has [n]-truncated fibers, then
 [Omega ^n X <~> Omega ^n Y].
 *******************************************************************************)
 
-Corollary loop_space_equiv_from_fiber_hlevel
+Corollary isequiv_loop_space_map_from_trunc_fiber
   {Y X} (f : Y .-> X)
   {n:nat} (Hn : forall x:X, IsTrunc n (hfiber f x))
 : IsEquiv (Omega_ptd_fmap_iterate f n).
