@@ -241,8 +241,21 @@ Proof.
   apply fcontr_isequiv, g_iseq.
 Qed.
 
-(* TODO (low): preservation of n-equivalences and n-truncatedness by
-functorial action. (Issue: we don’t have these defined in
+(* A slight aside, generalizing the previous lemma: if [P] is any property of types preserved under equivalence, then the property of being “fiberwise [P]” is stable under pullback. 
+
+Under Univalence, the hypothesis [P_pres_equiv] is of course unnecessary. *)
+Lemma pullback_preserves_fiberwise_properties
+  (P : Type -> Type) (P_pres_equiv : forall A B : Type, (A <~> B) -> P A -> P B)
+  {A B C:Type} (f:A->C) (g:B->C)
+: (forall c:C, P (hfiber g c)) -> (forall a:A, P (hfiber (f^* g) a)).
+Proof.
+  intros g_is_fiberwise_P a.
+  apply (P_pres_equiv (hfiber g (f a))).
+  apply equiv_inverse. apply hfiber_of_pullback.
+  apply g_is_fiberwise_P.
+Defined.
+
+(* TODO (low): corollary — stability of n-equivalences and n-truncated maps under pullback. (Issue: we don’t have these defined in
 library.) *)
 
 (*
