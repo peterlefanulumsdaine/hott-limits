@@ -812,8 +812,8 @@ Here we show (the “concrete” version) that the standardly-constructed
 double pullback is equal to the standardly-constructed one-step pullback.
 
 In Pullbacks3.v, we show (the “abstract” form) that given any pair of suitably
-composable squares, if the lower square is a pullback, then the outer
-rectangle is if and only if the upper square is.
+composable squares, if the right-hand square is a pullback, then the outer
+rectangle is if and only if the left-hand square is.
 
 *******************************************************************************)
 
@@ -870,15 +870,12 @@ End cospan_cones_vs_UP_pullback.
 (*******************************************************************************
 The *concrete* two pullbacks lemma:
 
-this states that given aps
+This lemma states that given maps
 
-       D
-       |h
-       V
-       B
-       |g
-       V
-A -f-> C
+                A
+                |f
+                V
+B2 -h-> B1 -g-> C
 
 the (standard) pullback of the overall rectangle, [pullback f (g o h)],
 is equivalent to the pullback constructed in two steps.
@@ -886,7 +883,7 @@ is equivalent to the pullback constructed in two steps.
 
 Section Concrete_Two_Pullbacks_Lemma.
 
-Context {A B C D : Type} (f : A -> C) (g : B -> C) (h : D -> B).
+Context {A B1 B2 C : Type} (f : A -> C) (g : B1 -> C) (h : B2 -> B1).
 
 Definition outer_to_double_pullback
 : (pullback f (g o h)) -> (pullback (g ^* f) h).

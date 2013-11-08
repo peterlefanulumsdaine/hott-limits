@@ -27,22 +27,19 @@ Defined.
 The *abstract* two pullbacks lemma.
 
 Suppose we have two squares that paste together to a rectangle, and
-the bottom square is a pullback. Then the whole rectangle is a
-pullback if and only if the top square is.
+the right square is a pullback. Then the whole rectangle is a
+pullback if and only if the left square is.
 
-P2 --> D
-|      |h
-V      V
-P1 --> B
-|_|    |g
-V      V
-A -f-> C
+P2 ---> P1 ---> A
+|       |_|     |f
+V       V       V
+B2 -h-> B1 -g-> C
 
 Below we give three approaches.
 
-A naming convention we mostly adhere to: cones over the lower square
-(f,g) are named [C1], [C1'], etc; cones over the upper square (or
-similar squares) are [C2], [C2'], etc; and cones over the whole
+A naming convention we mostly adhere to: cones over the right-hand 
+square (f,g) are named [C1], [C1'], etc; cones over the left-hand square
+(or similar squares) are [C2], [C2'], etc; and cones over the whole
 rectangle as [C3], etc. (TODO (mid): this convention is currently far
 from consistently used. Make it more so!)
 
@@ -53,7 +50,7 @@ improving compilation time, if possible.
 
 Section Abstract_Two_Pullbacks_Lemma.
 
-Context {A B C D : Type} (f : A -> C) (g : B -> C) (h : D -> B).
+Context {A B1 B2 C : Type} (f : A -> C) (g : B1 -> C) (h : B2 -> B1).
 
 Definition compose_cospan_cones {P1 : Type} (C1 : cospan_cone f g P1)
   {P2 : Type} (C2: cospan_cone (cospan_cone_map2 C1) h P2)
@@ -74,23 +71,20 @@ Defined.
 Approach 1: via showing that spaces of cones are equivalent. Both
 directions given.
 
-In this approach, we consider just the outer cospan and the bottom
+In this approach, we consider just the outer cospan and the right
 square as given:
 
-       D
-       |h
-       V
-P1 --> B
-|_|    |g
-V      V
-A -f-> C
+        P1 ---> A
+        |_|     |f
+        V       V
+B2 -h-> B1 -g-> C
 
-We then show that cone over the top left square is a pullback for that
+We then show that a cone over the left square is a pullback for that
 square iff the composite cone is a pullback for the whole rectangle.
 
 To prove this, we first construct a commutative triangle as follows:
 
-        _->  (Cones from X to upper square)
+        _->  (Cones from X to left-hand square)
       _-                 |
 [X,P2]_                  |
        -_                V
@@ -106,7 +100,7 @@ properties are equivalent.
 
 Section Approach1.
 
-Lemma top_cospan_cone_to_composite {P1 : Type} (C1 : cospan_cone f g P1)
+Lemma left_cospan_cone_to_composite {P1 : Type} (C1 : cospan_cone f g P1)
   {X : Type} (C2 : cospan_cone (cospan_cone_map2 C1) h X)
 : cospan_cone f (g o h) X.
 Proof.
@@ -120,14 +114,14 @@ Defined.
 Lemma two_pullback_triangle_commutes {P1 : Type} (C1 : cospan_cone f g P1)
   {P2 : Type} (C2 : cospan_cone (cospan_cone_map2 C1) h P2)
   {X : Type} (m : X -> P2)
-: top_cospan_cone_to_composite C1 (map_to_cospan_cone C2 X m)
-  = map_to_cospan_cone (top_cospan_cone_to_composite C1 C2) X m.
+: left_cospan_cone_to_composite C1 (map_to_cospan_cone C2 X m)
+  = map_to_cospan_cone (left_cospan_cone_to_composite C1 C2) X m.
 Proof.
   exact 1.
   (* Well, blow me down. Definitional equality!  Who’d’ve thunk it? *)
 Defined.
 
-Lemma composite_cospan_cone_to_top (P1 : abstract_pullback f g)
+Lemma composite_cospan_cone_to_left (P1 : abstract_pullback f g)
   {X : Type} (C2 : cospan_cone f (g o h) X)
 : cospan_cone (cospan_cone_map2 P1) h X.
 Proof.
@@ -139,14 +133,14 @@ Proof.
   apply (ap10 (packed_cospan_cone_map2 P1 C1') x).
 Defined.
 
-Lemma composite_cospan_cone_to_top_is_section
+Lemma composite_cospan_cone_to_left_is_section
   (P1 : abstract_pullback f g) (X : Type)
-: (@top_cospan_cone_to_composite _ P1 X) o (composite_cospan_cone_to_top P1)
+: (@left_cospan_cone_to_composite _ P1 X) o (composite_cospan_cone_to_left P1)
   == idmap.
 Proof.
   intros C2.
   set (C1' := @mk_cospan_cone _ _ _ f g _ _ _ (cospan_cone_comm C2)).
-  unfold top_cospan_cone_to_composite, composite_cospan_cone_to_top. simpl.
+  unfold left_cospan_cone_to_composite, composite_cospan_cone_to_left. simpl.
   unfold cospan_cone_map2. simpl.
   unfold cospan_cone_comm. simpl.
   apply cospan_cone_path'. simpl.
@@ -158,15 +152,15 @@ Proof.
   apply (packed_cospan_cone_comm P1 C1').
 Qed.
 
-Lemma top_cospan_cone_aux1 (P1 : abstract_pullback f g)
+Lemma left_cospan_cone_aux1 (P1 : abstract_pullback f g)
   {X : Type} (C2 : cospan_cone (cospan_cone_map2 P1) h X)
 : (BuildEquiv (pullback_cone_UP P1 X))^-1
       (@mk_cospan_cone _ _ _ f g _ _ _
-        (cospan_cone_comm (top_cospan_cone_to_composite P1 C2)))
+        (cospan_cone_comm (left_cospan_cone_to_composite P1 C2)))
   = cospan_cone_map1 C2.
 Proof.
   apply moveR_I.  simpl.
-  unfold top_cospan_cone_to_composite, cospan_cone_comm. simpl.
+  unfold left_cospan_cone_to_composite, cospan_cone_comm. simpl.
   apply cospan_cone_path'. 
 (* Alternative idea: equiv_intro C2, then use the [packed_] family. *)
   exists 1.
@@ -182,14 +176,14 @@ Proof.
   revert x. apply apD10. apply eisretr.
 Defined.
 
-Lemma top_cospan_cone_aux2 (P1 : abstract_pullback f g)
+Lemma left_cospan_cone_aux2 (P1 : abstract_pullback f g)
   {X : Type} (C2 : cospan_cone (cospan_cone_map2 P1) h X) (x:X)
   (C1' := @mk_cospan_cone _ _ _ f g _ _ _
-             (cospan_cone_comm (top_cospan_cone_to_composite P1 C2)))
-: ap (cospan_cone_map2 P1) (ap10 (top_cospan_cone_aux1 P1 C2) x)
+             (cospan_cone_comm (left_cospan_cone_to_composite P1 C2)))
+: ap (cospan_cone_map2 P1) (ap10 (left_cospan_cone_aux1 P1 C2) x)
   = (ap10 (ap cospan_cone_map2 (eisretr (map_to_cospan_cone P1 X) C1')) x
     @ (cospan_cone_comm C2 x)^).
-  unfold top_cospan_cone_aux1.  unfold moveR_I.
+  unfold left_cospan_cone_aux1.  unfold moveR_I.
   set (P1_UP_at_X := BuildEquiv (pullback_cone_UP P1 X)).
   rewrite ap_ap10.  rewrite ap_pp.
   change ((fun f' : X -> P1 => cospan_cone_map2 P1 o f'))
@@ -216,19 +210,19 @@ Lemma top_cospan_cone_aux2 (P1 : abstract_pullback f g)
   apply eisadj.
 Qed.
 
-Lemma composite_cospan_cone_to_top_is_retraction
+Lemma composite_cospan_cone_to_left_is_retraction
   (P1 : abstract_pullback f g) (X : Type)
-: (composite_cospan_cone_to_top P1) o (@top_cospan_cone_to_composite _ P1 X)
+: (composite_cospan_cone_to_left P1) o (@left_cospan_cone_to_composite _ P1 X)
   == idmap.
 Proof.
   intros C2.
   set (e := BuildEquiv (pullback_cone_UP P1 X)).
   set (C1' := (@mk_cospan_cone _ _ _ f g _ _ _
-             (cospan_cone_comm (top_cospan_cone_to_composite P1 C2)))).
-  unfold composite_cospan_cone_to_top.
+             (cospan_cone_comm (left_cospan_cone_to_composite P1 C2)))).
+  unfold composite_cospan_cone_to_left.
   fold C1'. fold e.
   apply cospan_cone_path'.
-    exists (top_cospan_cone_aux1 P1 C2).
+    exists (left_cospan_cone_aux1 P1 C2).
     exists 1.
   intros x. (* [simpl] hangs here. Are some hints looping? *)
   path_via' (ap10 (packed_cospan_cone_map2 P1 C1') x).
@@ -240,38 +234,38 @@ Proof.
     @ (cospan_cone_comm C2 x)^)
     @ cospan_cone_comm C2 x).
     apply inverse, concat_pV_p.
-  apply whiskerR. apply inverse. apply top_cospan_cone_aux2.
+  apply whiskerR. apply inverse. apply left_cospan_cone_aux2.
 Qed.
 
-Lemma top_cospan_cone_to_composite_isequiv
+Lemma left_cospan_cone_to_composite_isequiv
   (P1 : abstract_pullback f g) (X : Type)
-: IsEquiv (@top_cospan_cone_to_composite _ P1 X).
+: IsEquiv (@left_cospan_cone_to_composite _ P1 X).
 Proof.
-  apply (isequiv_adjointify (composite_cospan_cone_to_top P1)).
-  apply composite_cospan_cone_to_top_is_section.
-  apply composite_cospan_cone_to_top_is_retraction.
+  apply (isequiv_adjointify (composite_cospan_cone_to_left P1)).
+  apply composite_cospan_cone_to_left_is_section.
+  apply composite_cospan_cone_to_left_is_retraction.
 Qed.
 
 Lemma abstract_two_pullbacks_lemma
   (P1 : abstract_pullback f g)
   {P2 : Type} (C2 : cospan_cone (cospan_cone_map2 P1) h P2)
-: is_pullback_cone C2 <-> is_pullback_cone (top_cospan_cone_to_composite P1 C2).
+: is_pullback_cone C2 <-> is_pullback_cone (left_cospan_cone_to_composite P1 C2).
 Proof.
   set (P1_UP := pullback_cone_UP P1).
   split.
   (* -> *)
   intros C2_UP X.
-  change (map_to_cospan_cone (top_cospan_cone_to_composite P1 C2) X)
-  with (top_cospan_cone_to_composite P1 o (map_to_cospan_cone C2 X)).
+  change (map_to_cospan_cone (left_cospan_cone_to_composite P1 C2) X)
+  with (left_cospan_cone_to_composite P1 o (map_to_cospan_cone C2 X)).
   apply @isequiv_compose.
     apply C2_UP.
-  apply top_cospan_cone_to_composite_isequiv.
+  apply left_cospan_cone_to_composite_isequiv.
   (* <- *)
   intros C3_UP X.
-  apply (@cancelL_isequiv _ _ (top_cospan_cone_to_composite P1)
-    (top_cospan_cone_to_composite_isequiv _ _) _ (map_to_cospan_cone C2 X)).
-  change (top_cospan_cone_to_composite P1 o (map_to_cospan_cone C2 X))
-  with (map_to_cospan_cone (top_cospan_cone_to_composite P1 C2) X).
+  apply (@cancelL_isequiv _ _ (left_cospan_cone_to_composite P1)
+    (left_cospan_cone_to_composite_isequiv _ _) _ (map_to_cospan_cone C2 X)).
+  change (left_cospan_cone_to_composite P1 o (map_to_cospan_cone C2 X))
+  with (map_to_cospan_cone (left_cospan_cone_to_composite P1 C2) X).
   apply C3_UP.
 Qed.
 
@@ -280,7 +274,7 @@ End Approach1.
 (*******************************************************************************
 
 Approach 2: in this approach, we only show one direction: that if the
-upper square is a pullback, then so is the outer rectangle.
+left-hand square is a pullback, then so is the outer rectangle.
 
 We produce the equivalence required by the universal property as a
 composite of known equivalences; we then show that the underlying ap
@@ -374,34 +368,34 @@ Proof.
   unfold map_to_cospan_cone, compose. simpl.
   unfold cospan_cone_map2, cospan_cone_comm. simpl.
   assert (id_elim_lemma :
-    forall (x:X) (b:B) (q : b = h (ppf (alpha x)))
+    forall (x:X) (b:B1) (q : b = h (ppf (alpha x)))
       (p : f (pg (ph (alpha x))) = g b),
-    @id_opp_elim B (h (ppf (alpha x)))
-      (fun (b : B) (_ : b = h (ppf (alpha x))) =>
+    @id_opp_elim B1 (h (ppf (alpha x)))
+      (fun (b : B1) (_ : b = h (ppf (alpha x))) =>
          f (pg (ph (alpha x))) = g b ->
-         @pullback A D C f (fun x0 : D => g (h x0)))
+         @pullback A B2 C f (fun x0 : B2 => g (h x0)))
       (fun p : f (pg (ph (alpha x))) = g (h (ppf (alpha x))) =>
-         @mk_pullback A D C f (fun x0 : D => g (h x0))
+         @mk_pullback A B2 C f (fun x0 : B2 => g (h x0))
            (pg (ph (alpha x))) (ppf (alpha x)) p)
       b q p
    =
-      @mk_pullback A D C f (g o h)
+      @mk_pullback A B2 C f (g o h)
         (pg (ph (alpha x)))
         (ppf (alpha x))
         (p @ ap g q)).
   assert (id_elim_lemma' :
-    forall (x:X) (b:B) (q : h (ppf (alpha x)) = b)
+    forall (x:X) (b:B1) (q : h (ppf (alpha x)) = b)
       (p : f (pg (ph (alpha x))) = g b),
-    @id_opp_elim B (h (ppf (alpha x)))
-      (fun (b : B) (_ : b = h (ppf (alpha x))) =>
+    @id_opp_elim B1 (h (ppf (alpha x)))
+      (fun (b : B1) (_ : b = h (ppf (alpha x))) =>
          f (pg (ph (alpha x))) = g b ->
-         @pullback A D C f (fun x0 : D => g (h x0)))
+         @pullback A B2 C f (fun x0 : B2 => g (h x0)))
       (fun p : f (pg (ph (alpha x))) = g (h (ppf (alpha x))) =>
-         @mk_pullback A D C f (fun x0 : D => g (h x0))
+         @mk_pullback A B2 C f (fun x0 : B2 => g (h x0))
            (pg (ph (alpha x))) (ppf (alpha x)) p)
       b (q^) p
    =
-      @mk_pullback A D C f (g o h)
+      @mk_pullback A B2 C f (g o h)
         (pg (ph (alpha x)))
         (ppf (alpha x))
         (p @ ap g (q^))).
@@ -414,14 +408,14 @@ Proof.
     apply id_elim_lemma'.
     (* id_elim_lemma proven *)
   path_via
-    (map_to_pullback_to_cospan_cone f (fun x : D => g (h x)) X
+    (map_to_pullback_to_cospan_cone f (fun x : B2 => g (h x)) X
     (fun x:X => mk_pullback f (g o h)
       (pg (ph (alpha x)))
       (ppf (alpha x))
       (phi (ph (alpha x)) @ ap g (psi (alpha x))))).
   apply ap. apply path_forall. intros x.
-  path_via (@id_opp_elim B (h (ppf (alpha x)))
-     (fun (b : B) (_ : b = h (ppf (alpha x))) =>
+  path_via (@id_opp_elim B1 (h (ppf (alpha x)))
+     (fun (b : B1) (_ : b = h (ppf (alpha x))) =>
       f (pg (ph (alpha x))) = g b ->
       pullback f (g o h))
      (fun p : f (pg (ph (alpha x))) = g (h (ppf (alpha x))) =>
@@ -429,8 +423,8 @@ Proof.
         (pg (ph (alpha x))) (ppf (alpha x)) p) (pf (ph (alpha x)))
      (psi (alpha x))
      (phi (ph (alpha x)))).
-  apply (ap (fun q => @id_opp_elim B (h (ppf (alpha x)))
-     (fun (b : B) (_ : b = h (ppf (alpha x))) =>
+  apply (ap (fun q => @id_opp_elim B1 (h (ppf (alpha x)))
+     (fun (b : B1) (_ : b = h (ppf (alpha x))) =>
       f (pg (ph (alpha x))) = g b ->
       pullback f (g o h))
      (fun p : f (pg (ph (alpha x))) = g (h (ppf (alpha x))) =>
@@ -438,7 +432,7 @@ Proof.
         (pg (ph (alpha x))) (ppf (alpha x)) p) (pf (ph (alpha x)))
      q
      (phi (ph (alpha x))))).
-  path_via (ap (fun x0 : B => x0) (psi (alpha x))).
+  path_via (ap (fun x0 : B1 => x0) (psi (alpha x))).
   apply ap_idmap. *)
 Admitted.
 (* This succeeds during proof-building, but fails to pass the [Defined.]
@@ -467,7 +461,7 @@ End Approach2.
 
 (*******************************************************************************
 
-Approach 3: one direction only: if the top square is a pullback, then
+Approach 3: one direction only: if the left square is a pullback, then
 so is the whole rectangle.
 
 A completely direct construction of the equivalence required by the
@@ -487,10 +481,10 @@ Proof.
   set (C2_UP_at_X := BuildEquiv (pullback_cone_UP P2 X)).
   (* TODO (mid): reconsider implicit arguments of [mk_cospan_cone]. *)
   set (cone_to_f_g := (@mk_cospan_cone _ _ _ f g X _ _ (cospan_cone_comm C3))).
-  (* For the eventual ap, use the universal property of the upper square. *)
+  (* For the eventual ap, use the universal property of the left-hand square. *)
   apply (C2_UP_at_X ^-1).
   (* For the first leg of this cone, use the universal property of the
-     lower square. *)
+     right-hand square. *)
   exists (C1_UP_at_X ^-1 cone_to_f_g).
   exists (cospan_cone_map2 C3).
   intros x.
