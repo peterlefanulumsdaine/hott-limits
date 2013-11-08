@@ -279,7 +279,7 @@ Lemma hprop_is_pullback_cone {A B C : Type} {f : A -> C} {g : B -> C}
   {P : Type} (D : cospan_cone f g P)
 : IsHProp (is_pullback_cone D).
 Proof.
-(* This proof consists just of the typeclass instances [trunc_forall] and [hprop_isequiv], so can be found automatically by Coq. *)
+(* Coq automatically finds [trunc_forall] and [hprop_isequiv]: *)
   exact _.
 Defined.
 
