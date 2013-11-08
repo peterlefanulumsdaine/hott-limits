@@ -61,24 +61,24 @@ Loop spaces can be expressed as pullbacks.
 
 Section Loops.
 
-Definition Omega (A:Type) (a0:A) : Type
+Definition Omega (A : Type) (a0 : A) : Type
 := (a0 = a0).
 
 (* TODO (mid): possibly rename the following as [Omega_to_] etc. *)
-Definition loop_to_pullback {A:Type} {a0:A} (l : Omega A a0)
+Definition loop_to_pullback {A : Type} {a0 : A} (l : Omega A a0)
 : pullback (name a0) (name a0).
 Proof.
   exists tt. exists tt. exact l.
 Defined.
 
-Definition pullback_to_loop {A:Type} {a0:A}
+Definition pullback_to_loop {A : Type} {a0 : A}
   (tsl : pullback (name a0) (name a0))
 : Omega A a0.
 Proof.
   destruct tsl as [[] [[] l]]. exact l.
 Defined.
 
-Lemma loop_is_pullback {A:Type} {a0:A}
+Lemma loop_is_pullback {A : Type} {a0 : A}
 : (Omega A a0) <~> (pullback (name a0) (name a0)).
 Proof.
   exists (loop_to_pullback).
@@ -89,7 +89,7 @@ Proof.
   intros l. exact 1.
 Defined.
 
-Definition Omega_fmap {A B:Type} (a0:A) (f:A->B)
+Definition Omega_fmap {A B : Type} (a0 : A) (f : A->B)
 : (Omega A a0) -> (Omega B (f a0)).
 Proof.
   exact (ap f).
@@ -241,7 +241,9 @@ Proof.
   apply fcontr_isequiv, g_iseq.
 Qed.
 
-(* A slight aside, generalizing the previous lemma: if [P] is any property of types preserved under equivalence, then the property of being “fiberwise [P]” is stable under pullback. 
+(* A slight aside, generalizing the previous lemma: if [P] is any
+property of types preserved under equivalence, then the property of
+being “fiberwise [P]” is stable under pullback.
 
 Under Univalence, the hypothesis [P_pres_equiv] is of course unnecessary. *)
 Lemma pullback_preserves_fiberwise_properties
@@ -255,8 +257,9 @@ Proof.
   apply g_is_fiberwise_P.
 Defined.
 
-(* TODO (low): corollary — stability of n-equivalences and n-truncated maps under pullback. (Issue: we don’t have these defined in
-library.) *)
+(* TODO (low): corollary — stability of n-equivalences and n-truncated
+maps under pullback. (Issue: we don’t have these defined in library.)
+*)
 
 (*
 Local Variables:
