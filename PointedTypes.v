@@ -37,15 +37,15 @@ Global Arguments mk_pointed_map [X Y] f alpha : rename.
 Definition idmap_ptd (X : pointed_type) : pointed_map X X
 := {| pt_map := idmap ; pt_map_pt := 1 |}.
 
-(* TODO (mid): category structure on aps. *)
+(* TODO (mid): category structure on maps. *)
 
 End Pointed_Types.
 
 Notation "A .-> B" := (pointed_map A B)
   (at level 75, right associativity).
 
-(* A quick notation for using aps that *definitionally* preserve
-  the point as pointed aps. *)
+(* A quick notation for using maps that *definitionally* preserve
+  the point as pointed maps. *)
 Notation "[ 'pointed' f ]" := {| pt_map := f; pt_map_pt := 1 |}
   (at level 40).
 

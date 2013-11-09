@@ -47,21 +47,21 @@ End Varia.
 
 (*******************************************************************************
 
-Pointed aps/short exact sequence.
+Pointed maps/short exact sequence.
 
 A (short) homotopy fiber sequence may be given in several equivalent ways:
 
-(a) a sequence F -> E -> B of aps of pointed types, together with an
+(a) a sequence F -> E -> B of maps of pointed types, together with an
 equivalence (pointed and over E) between F and the (pointed) homotopy
 fiber of E over the base;
 
-(b) a ap E -> B of pointed types [from F may be recovered as the
+(b) a map E -> B of pointed types [from F may be recovered as the
 (pointed) homotopy fiber];
 
-(c) a ap E -> B of types, and a point of E [from which, for (c), the
+(c) a map E -> B of types, and a point of E [from which, for (c), the
 point of B may be recovered as the image];
 
-(d) a pointed type (B,b0), and a ap P : B -> Type, with a point of P
+(d) a pointed type (B,b0), and a map P : B -> Type, with a point of P
 b0 [from which, for (c), E may be recovered as the total space];
 
 …more?
@@ -90,7 +90,7 @@ Long exact sequence.
 *******************************************************************************)
 
 (* TODO (high): make this a pointed equivalence!  Possibly also rewrite this
-to make the underlying ap explicit. *)
+to make the underlying map explicit. *)
 Theorem long_exact_thm
 : forall {X Y : pointed_type} (f:Y.->X),
     (pt_type (hfiber_ptd (hfiber_incl_ptd f)))

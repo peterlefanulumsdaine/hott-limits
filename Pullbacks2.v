@@ -212,7 +212,7 @@ End Pullbacks_as_Equalizers.
 
 (*******************************************************************************
 
-Various interesting properties of aps are stable under pullback.
+Various interesting properties of maps are stable under pullback.
 
 In particular, any property of the form “all hfibers of [g] are nice”
 is pullback-stable, since each hfiber of the pullback of [g] is

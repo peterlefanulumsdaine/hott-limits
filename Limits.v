@@ -396,7 +396,7 @@ End Limit_UP_facts.
 
 The main goal of the next few sections is to prove functoriality of
 the standard limit construction. As in Pullbacks, we first prove
-basic properties of aps of diagrams.
+basic properties of maps of diagrams.
 
 *******************************************************************************)
 

@@ -117,7 +117,7 @@ End Right_Proper.
 
 (******************************************************************************
 
-Every ap factors into a weak equivalence followed by a fibration.
+Every map factors into a weak equivalence followed by a fibration.
 
 Note: somewhat redundant with material in [Section FibrationReplacement] in
 [UsefulEquivalences.v.]
@@ -205,7 +205,7 @@ Various facts on weak equivalences.
 Section Equivalences.
 
 (*******************************************************************************
-The 2 out of 3 property for equivalences: given a pair of aps
+The 2 out of 3 property for equivalences: given a pair of maps
 A --f-> B --g-> C, if any two of f, g, and (g o f) are equivalences, then so
 is the third.
 

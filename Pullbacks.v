@@ -35,7 +35,7 @@ Definition pullback_comm {A B C : Type} {f : A -> C} {g : B -> C}
   (x : pullback f g) := pr2 (pr2 x).
 
 (* Sometimes one wants to view one the pullback projections as the
-pullback of a ap. Arbitrarily, we choose the second projection as
+pullback of a map. Arbitrarily, we choose the second projection as
 the one to use in this way. *)
 Notation "f ^* g" := (@pullback_pr2 _ _ _ g f) (at level 45).
 
@@ -485,7 +485,7 @@ Proof.
   apply equiv_inverse, abstract_pullback_equiv_cospan_cone_1.
 Defined.
 
-(* TODO (mid): we should really show if possible, that this ap is the same as the (unique by construction) map that takes the cone of PB2 to the cone of PB1. *)
+(* TODO (mid): we should really show if possible, that this map is the same as the (unique by construction) map that takes the cone of PB2 to the cone of PB1. *)
 
 End Pullback_UP_facts.
 
@@ -583,7 +583,7 @@ Definition cospan_comp
     (comm_square_comp (cospan_map_f h) (cospan_map_f k))
     (comm_square_comp (cospan_map_g h) (cospan_map_g k)).
 
-(* Important fact: a cospan ap whose components are equivalences is itself
+(* Important fact: a cospan map whose components are equivalences is itself
    an equivalence in the category of cospans. *)
 Lemma cospan_equiv_inverse
   {A B C : Type} {f : A -> C} {g : B -> C}
@@ -820,7 +820,7 @@ rectangle is if and only if the left-hand square is.
 
 (******************************************************************************
 
-To show: when we package a cone up into a ap and then unpack it,
+To show: when we package a cone up into a map and then unpack it,
 we recover the components of the original cone.
 
 *******************************************************************************)

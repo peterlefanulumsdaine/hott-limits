@@ -90,9 +90,9 @@ To prove this, we first construct a commutative triangle as follows:
        -_                V
          ->  (Cones from X to rectangle)
 
-and then show that the right-hand vertical ap is a weak equivalence.
+and then show that the right-hand vertical map is a weak equivalence.
 
-It then follows, by 2-of-3, that either of the diagonal aps is an
+It then follows, by 2-of-3, that either of the diagonal maps is an
 equivalence if the other one is; i.e. that the two universal
 properties are equivalent.
 
