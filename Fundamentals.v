@@ -231,50 +231,60 @@ stating that in a chain [h o g o f], if [h o g] and [g o f] are both weak
 equivalences, then so are [h], [g], [f], and [h o g o f].
 *******************************************************************************)
 
-(* TODO (high): possibly give the proof used in the paper (slightly longer, but doesn’t rely on two-of-three) as well as, or instead of, the present one. *)
-
 Lemma two_of_six_hgf {X Y Z W : Type} (f: X -> Y) (g: Y -> Z) (h: Z -> W)
 : IsEquiv (h o g) -> IsEquiv (g o f) -> IsEquiv (h o g o f).
 Proof.
   intros hg_iseq gf_iseq.
-  set (hg_eq := BuildEquiv (hg_iseq)).
-  set (gf_eq := BuildEquiv (gf_iseq)).
-  set (hgf_inv := gf_eq ^-1 o g o hg_eq ^-1).
-  apply isequiv_adjointify with hgf_inv.
+  apply isequiv_adjointify with ((g o f) ^-1 o g o (h o g) ^-1).
   (* is_section *)
-  intros y. unfold hgf_inv, compose; simpl.
-  path_via (h ( g (hg_eq ^-1 y))).
-    apply ap. apply (eisretr gf_eq).
-    apply (eisretr hg_eq).
+  intros y. unfold compose; simpl.
+  path_via (h ( g ((h o g) ^-1 y))).
+    apply ap. apply (eisretr (g o f)).
+    apply (eisretr (h o g)).
   (* is_retraction *)
-  intros x. unfold hgf_inv, compose; simpl.
-  path_via (gf_eq ^-1 (g (f x))).
-    repeat apply ap. apply (eissect hg_eq).
-    apply (eissect gf_eq).
+  intros x. unfold compose; simpl.
+  path_via ((g o f) ^-1 (g (f x))).
+    repeat apply ap. apply (eissect (h o g)).
+    apply (eissect (g o f)).
 Qed.
 
 Lemma two_of_six_h {X Y Z W : Type} (f: X -> Y) (g: Y -> Z) (h: Z -> W)
 : IsEquiv (h o g) -> IsEquiv (g o f) -> IsEquiv h.
 Proof.
   intros hg_iseq gf_iseq.
-  apply (equiv_two_of_three_left (g o f) h); try assumption.
-  apply (two_of_six_hgf f g h); assumption.
+  apply isequiv_adjointify with (g o (h o g) ^-1).
+  (* is_section *)
+  intros w. apply (eisretr (h o g)).
+  (* is_retraction *)
+  intros z.
+  path_via ((g o (h o g) ^-1) (h (g (f ((g o f)^-1 z))))).
+    apply ap, ap, inverse, (eisretr (g o f)).
+  path_via (g (f ((g o f)^-1 z))).
+    apply (ap g), (eissect (h o g)).
+  apply (eisretr (g o f)).
 Qed.
 
 Lemma two_of_six_g {X Y Z W : Type} (f: X -> Y) (g: Y -> Z) (h: Z -> W)
 : IsEquiv (h o g) -> IsEquiv (g o f) -> IsEquiv g.
 Proof.
   intros hg_iseq gf_iseq.
-  apply (equiv_two_of_three_right g h); try assumption.
-  apply (two_of_six_h f g h); assumption.
+  apply equiv_biinv; split.
+  (* left inverse*) exists ((h o g)^-1 o h). apply eissect.
+  (* right inverse*) exists (f o (g o f)^-1). apply (eisretr (g o f)).
 Qed.
 
 Lemma two_of_six_f {X Y Z W : Type} (f: X -> Y) (g: Y -> Z) (h: Z -> W)
 : IsEquiv (h o g) -> IsEquiv (g o f) -> IsEquiv f.
 Proof.
   intros hg_iseq gf_iseq.
-  apply (equiv_two_of_three_right f (h o g)); try assumption.
-  apply (two_of_six_hgf f g h); assumption.
+  apply isequiv_adjointify with ((g o f) ^-1 o g).
+  (* is_section *)
+  intros y.
+  apply (concat (eissect (h o g) _)^).
+  apply (fun p => p @ (eissect (h o g) y)).
+  apply (ap (h o g)^-1), (ap h), (eisretr (g o f)).
+  (* is_retraction *)
+  apply (eissect (g o f)).
 Qed.
 
 End Equivalences.
