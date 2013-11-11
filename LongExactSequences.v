@@ -66,16 +66,7 @@ b0 [from which, for (c), E may be recovered as the total space];
 
 …more?
 
-TODO (mid): consider which of these definitions will give the clearest
-versions of theorems and proofs. (c) seems most parsimonious; (b)
-gives perhaps the clearest categorical picture; (d) perhaps reduces
-how much use of homotopy fibers is required?
-
 *******************************************************************************)
-
-(* TODO (mid), perhaps: equivalence of the various definitions [or... well,
-the full equivalence of all would require univalence... how much, if
-anything, should we do?]. *)
 
 (******************************************************************************
 Long exact sequence.
@@ -89,8 +80,6 @@ Long exact sequence.
                                 y -> Y -> Z
 *******************************************************************************)
 
-(* TODO (high): make this a pointed equivalence!  Possibly also rewrite this
-to make the underlying map explicit. *)
 Theorem long_exact_thm
 : forall {X Y : pointed_type} (f:Y.->X),
     (pt_type (hfiber_ptd (hfiber_incl_ptd f)))

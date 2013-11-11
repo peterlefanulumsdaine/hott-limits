@@ -122,9 +122,6 @@ Proof.
   apply whiskerR. apply inverse, inv_V.
 Defined.
 
-(* TODO (low): show how [limit_homot_to_path] acts when apped under
-projections (analogous to [pr1_total_path], etc). *)
-
 End Concrete_Limits.
 
 
@@ -219,8 +216,6 @@ Proof.
   intros i j f x. unfold compose; simpl. exact (lim_pr2 x f).
 Defined.
 
-(* TODO: should D and X be implicit here and in the next definition?
-   (Also in Pullbacks.) *)
 Definition map_to_limit_to_graph_cone {D : diagram G} {X : Type}
   (m : X -> limit D)
   := map_to_graph_cone (limit_graph_cone D) _ m
@@ -254,8 +249,6 @@ Proof.
   exists (fun i => 1). simpl.
   intros i j f. exact (concat_1p _ @ (concat_p1 _)^).
 Defined.
-
-(* TODO: lock this, as in pullbacks *)
 
 End Limit_UP.
 
@@ -341,7 +334,6 @@ Definition mk_abstract_limit' {D : diagram G} {L : Type} {CL : graph_cone D L}
   : abstract_limit D
 := (mk_abstract_limit (existT _ CL CL_UP)).
 
-(* TODO (med): change back to Canonical Structure once bug fixed. *)
 Definition standard_limit (D : diagram G) : abstract_limit D
 := mk_abstract_limit' (limit_universal D).
 
@@ -434,8 +426,6 @@ Proof.
   destruct m2 as [m2_obj m2_comm].
   destruct h as [h_obj h_comm]. simpl in *.
   revert h_obj h_comm.
-  (* TODO (mid): the following two steps wwer much easier over old library.
-  Can that ease be recovered? *)
   set (E := (@equiv_functor_forall _
     G (fun i => m1_obj i = m2_obj i)
     G (fun i => m1_obj i == m2_obj i)
@@ -621,13 +611,6 @@ Definition lim_as_eq {G : graph} (D : diagram G) : Type
    let ap1 (x : prod1) {i j:G} (f:G i j) := (D .1 f) (x i) in
    let ap2 (x : prod1) {i j:G} (f:G i j) := x j in
    equalizer ap1 ap2.
-
-(* TODO (low): Is there a way to make this a coercion!?  It’s late at night,
-and I can’t see what the target class ought to be to do so.
-
-TODO (low): move, if we can get this working as a coercion; delete, if not. *)
-Definition equalizer_pr1 {X Y} {f g:X -> Y} (x : equalizer f g) : X
-:= pr1 x.
 
 Definition lim_as_eq_cone (D : diagram G)
 : graph_cone D (lim_as_eq D).

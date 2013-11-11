@@ -8,8 +8,6 @@ Basic results on equalizers. Just a stub for now; given a file of its
 own since it is used in both [Limits.v] and [Pullbacks.v], which are
 otherwise independent.
 
-TODO (mid): add a section on the universal property of equalizers.
-
 *******************************************************************************)
 
 Require Import HoTT.

@@ -64,7 +64,6 @@ Section Loops.
 Definition Omega (A : Type) (a0 : A) : Type
 := (a0 = a0).
 
-(* TODO (mid): possibly rename the following as [Omega_to_] etc. *)
 Definition loop_to_pullback {A : Type} {a0 : A} (l : Omega A a0)
 : pullback (name a0) (name a0).
 Proof.
@@ -256,10 +255,6 @@ Proof.
   apply equiv_inverse. apply hfiber_of_pullback.
   apply g_is_fiberwise_P.
 Defined.
-
-(* TODO (low): corollary — stability of n-equivalences and n-truncated
-maps under pullback. (Issue: we don’t have these defined in library.)
-*)
 
 (*
 Local Variables:

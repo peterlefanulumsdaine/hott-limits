@@ -377,10 +377,6 @@ Defined.
 Definition nat_HSet : HSet
   := Build_HSet nat nat_is_hset.
 
-(* TODO (mid): re-enable this as soon as the Canonical Structures issue is fixed.
-Canonical Structure nat_HSet.
-*)
-
 (*
 Local Variables:
 coq-prog-name: "hoqtop"

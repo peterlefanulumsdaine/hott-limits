@@ -25,16 +25,6 @@ Notation pr2 := projT2.
 Arguments pr1 {_ _} _.
 Arguments pr2 {_ _} _.
 
-(* TODO (mid): possible improvements now that we’re over the new library.
-
-- increase usage of the [moveL_Pm] family;
-
-- use [apply (concat H)] and [apply (concatR H)], rather than e.g. [path_via' p. apply H.]
-
-- use [whiskerL], [whiskerR] rather than [apply (ap (concat p))] and [apply (ap (fun q => q @ p))].
-
-*)
-
 (*******************************************************************************
 
 Paths.
@@ -58,10 +48,6 @@ Proof.
 Defined.
 (* Note: this proof, while clean, is proof-theoretically overkill — it requires a universe, since inspecting it carefully, it Id-eliminates into a Pi-type with large domain (since P has to be generalized).  With a little more work, it can be proved more economically, using just pure M-L TT. *)
  
-
-(* TODO (low): in HoTT library, sort out redundancy between [path_sigma] family (in [types/Sigma.v] and [total_path] family.
-
-Once that’s done, replace the following by [path_sigma_uncurried].*)
 Definition total_path' {X : Type} {P : X -> Type} {s s' : {x:X & P x}}
 : { p : pr1 s = pr1 s' & p # pr2 s = pr2 s' } -> s = s'.
 Proof.
@@ -127,8 +113,6 @@ Proof.
   destruct p. destruct q. destruct r. simpl. exact 1.
 Defined.
 
-(* TODO (low): triple_path_pr3.  (The tricky bit is typing the statement.) *)
-
 End TriplePaths.
 
 (*******************************************************************************
@@ -137,36 +121,22 @@ Equivalences.
 
 *******************************************************************************)
 
-(* TODO (low): move this declarations into the section itself, once weird bug is sorted out. *)
 Arguments BuildEquiv [A B f] _ : rename.
 
 Section Equivs.
 
-(* TODO (high): move to library. *)
 Global Arguments equiv_inv [A B] f {_} x.
 
-(* TODO (low): consider; possibly move to library. *)
 Global Arguments equiv_fun [A B] _ _.
 Global Arguments equiv_isequiv [A B] e.
 Global Arguments isequiv_adjointify [A B f] _ _ _.
 
-(* TODO (med): Unnecessary here; but probably move to library. *)
 Global Arguments isequiv_ap [A B] f {_} x y.
 
-(* TODO (high): move to library. *)
 Global Arguments isequiv_postcompose {_} A [B C] f {_}.
 Global Arguments isequiv_precompose {_} [A B] C f {_}.
 
-(*
-TODO (low): also consider/try changing arguments as follows:
-Arguments cancelL_isequiv [B C] g {ge} [A] f {fge} : rename.
-Arguments cancelR_isequiv [A B] f {fe} [C] g {gfe}.
-
-Also: consider changing the order of their arguments; and *definitely* try making them not instances.
-*)
-
 (* Compare to [map_equiv_o_inverse] in old library *)
-(* TODO (low): actually, this is an instance of homotopy-naturality, [concat_Ap].  Can it be replaced by that? *)
 Lemma ap_inverse_o_equiv {A B : Type} (e : A <~> B)
   {x y : B} (p : x = y)
 : ap e (ap (e ^-1) p)
@@ -198,7 +168,6 @@ HLevels.
 
 Section HLevels.
 
-(* TODO (low): move to HoTT? *)
 Record HSet := {
   hset_carrier :> Type;
   ishset_hset : IsHSet hset_carrier }.
@@ -232,7 +201,6 @@ Definition apD10_path_forall' {A : Type} {P : A -> Type}
   {f g : forall x, P x} (h : f == g) (x:A)
   : apD10 (path_forall h) x = h x
 := (apD10_path_forall _ _ h x).
-(*TODO (high): consistentize the various ways of using [eisretr], [apD10_path_forall], etc. *)
 
 End Funext.
 
@@ -244,7 +212,6 @@ Various things that don’t have a clear home.
 
 Section Varia.
 
-(* TODO (low): move to live with hfibers?  Where do they live? *)
 Definition hfiber_incl {X Y:Type} (f:X -> Y) (y:Y) : hfiber f y -> X
 := pr1.
 

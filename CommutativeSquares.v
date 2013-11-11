@@ -69,7 +69,6 @@ Proof.
 Defined.
 
 (* and similarly, [comm_square_inverse] is a section (aka right equiv_inv). *)
-(* TODO (low) : simplify proof!? *)
 Lemma comm_square_inverse_is_retr
   {A B : Type} {f : A -> B}
   {A' B' : Type} {f' : A' -> B'}

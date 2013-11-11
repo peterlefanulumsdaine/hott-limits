@@ -19,10 +19,8 @@ Pointed types.
 
 *******************************************************************************)
 
-(* TODO (high): consistentize use of capital letters, throughout development *)
 Section Pointed_Types.
 
-(* TODO (low): would these be better just as sigma-types, maybe? *)
 Record pointed_type := mk_pointed_type {
   pt_type :> Type;
   point : pt_type }.
@@ -36,8 +34,6 @@ Global Arguments mk_pointed_map [X Y] f alpha : rename.
 
 Definition idmap_ptd (X : pointed_type) : pointed_map X X
 := {| pt_map := idmap ; pt_map_pt := 1 |}.
-
-(* TODO (mid): category structure on maps. *)
 
 End Pointed_Types.
 
@@ -66,9 +62,6 @@ Canonical Structure Unit_Ptd.
 Definition hfiber_ptd {X Y : pointed_type} (f : X .-> Y) : pointed_type
 := mk_pointed_type (hfiber f (point Y)) (point X; pt_map_pt f).
 
-(* TODO (mid): fix once this issue is cleared up. *)
-(* Canonical Structure hfiber_ptd. *)
-
 Definition hfiber_incl_ptd {X Y : pointed_type} (f : X .-> Y)
   : (hfiber_ptd f) .-> X
 := @mk_pointed_map (hfiber_ptd f) X (hfiber_incl f (point Y)) 1.
@@ -89,9 +82,6 @@ Section Omega_Ptd.
 Definition Omega_ptd (A:pointed_type) : pointed_type
 := {| pt_type := Omega A (point A);
       point := idpath (point A) |}.
-
-(* TODO (mid): fix once this issue is cleared up. *)
-(* Canonical Structure Omega_Ptd. *)
 
 Definition Omega_ptd_fmap {A B : pointed_type} (f : A .-> B)
 : (Omega_ptd A) .-> (Omega_ptd B).

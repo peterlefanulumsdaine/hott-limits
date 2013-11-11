@@ -18,10 +18,6 @@ Require Import Auxiliary.
 Each homotopy fiber of the total space of a fibration is weakly equivalent to
 the corresponding fiber of the original fibration.
 
-TODO (low): compare to section [hfiber_fibration] in
-UsefulEquivalences.v, which shows the same equivalence. Do we want to
-include this here, or should we just use the library version?
-
 *******************************************************************************)
 
 Section Fibration_Equiv.

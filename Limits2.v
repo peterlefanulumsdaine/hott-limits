@@ -146,7 +146,6 @@ Equalizer as limit.
 
 Section Equalizer_as_Limit.
 
-(* TODO (low): use these, or just bool? *)
 Inductive equalizer_graph_0 : Type :=
   eq_source | eq_target.
 
@@ -253,14 +252,6 @@ Definition nat_graph_1 (i j : nat) : Type
 Definition nat_graph := Build_graph nat nat_graph_1.
 
 End Nat_graph.
-
-Section Nat_Limit_Facts.
-(* TODO (mid): Think of some theorem(s) to give here?
-
-E.g.: limit of a chain of n-equivalences is an n-equivalence.
-
-*)
-End Nat_Limit_Facts.
 
 End Limit_Examples.
 

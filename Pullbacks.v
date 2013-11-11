@@ -175,8 +175,6 @@ Definition cospan_cone_map2 {A B C : Type} {f : A -> C} {g : B -> C}
 Definition cospan_cone_comm {A B C : Type} {f : A -> C} {g : B -> C}
   {X : Type} (C : cospan_cone f g X) := pr2 (pr2 C).
 
-(* TODO (mid): try redoing without triple_path
-  (but then be careful to check Pullbacks3 over it). *)
 Definition cospan_cone_path
   {A B C : Type} {f : A -> C} {g : B -> C} {X : Type}
   {Phi1 Phi2 : cospan_cone f g X}
@@ -249,8 +247,6 @@ Proof.
   apply (pr2_triple_path _ Phi1 Phi2).
 Defined.
 
-(* TODO (mid): cospan_cone_path_path *)
-
 End Cospan_Cone.
 
 
@@ -262,7 +258,6 @@ The universal property of pullbacks.
 
 Section Pullback_UP.
 
-(* TODO (high): try finding a naming scheme more related to the idea of “composition”. *) 
 Definition map_to_cospan_cone {A B C : Type} {f : A -> C} {g : B -> C}
   {P : Type} (D: cospan_cone f g P) (X : Type) (u : X -> P)
 : cospan_cone f g X.
@@ -399,7 +394,6 @@ Properties of pullbacks in general, via U.P.’s.
 
 Section Pullback_UP_facts.
 
-(* TODO (med): is this really needed, or would it be more natural to go directly from [is_pullback_cone] to [abstract_pullback]? *)
 Definition pullback_cone {A B C : Type} (f : A -> C) (g : B -> C) (P : Type)
 := { CP : cospan_cone f g P & is_pullback_cone CP }.
 
@@ -408,7 +402,6 @@ Definition pullback_cone_cone {A B C : Type} {f : A -> C} {g : B -> C}
 := pr1 CP : cospan_cone f g P.
 Coercion pullback_cone_cone : pullback_cone >-> cospan_cone.
 
-(* TODO (low): would it affect anything to make this opaque? *)
 Definition pullback_cone_UP {A B C : Type} {f : A -> C} {g : B -> C}
   {P : Type} (CP : pullback_cone f g P)
 := pr2 CP : is_pullback_cone CP.
@@ -432,11 +425,6 @@ Definition standard_pullback {A B C : Type} (f : A -> C) (g : B -> C)
   := mk_abstract_pullback' (pullback_universal f g)
 : abstract_pullback f g.
 
-(* TODO (low): the following is currently broken due to a bug(?) with univ poly(?):
-  Canonical Structure standard_pullback.
-Once fixed, many references to [standard_pullback] below can be changed back to simply [pullback]. *)
-
-(* TODO (high): improve the following section to better reflect the paper?? *)
 Lemma is_pullback_cone_resp_equiv {A B C : Type} {f : A -> C} {g : B -> C}
   {P P' : Type} (e : P' <~> P) (CP : cospan_cone f g P)
 : is_pullback_cone CP -> is_pullback_cone (map_to_cospan_cone CP P' e).
@@ -484,8 +472,6 @@ Proof.
     apply abstract_pullback_equiv_cospan_cone_1.
   apply equiv_inverse, abstract_pullback_equiv_cospan_cone_1.
 Defined.
-
-(* TODO (mid): we should really show if possible, that this map is the same as the (unique by construction) map that takes the cone of PB2 to the cone of PB1. *)
 
 End Pullback_UP_facts.
 
@@ -683,9 +669,6 @@ Proof.
   unfold pullback_comm, pullback_pr2; simpl. hott_simpl.
 Defined.
 
-(* TODO (low): a better associativity tactic would vastly simplify this
-   proof! 
-   TODO (low): rewrite to avoid destructing? *)
 Lemma pullback_fmap_comp
   {A B C : Type} (f : A -> C) (g : B -> C)
   {A' B' C' : Type} (f' : A' -> C') (g' : B' -> C')
