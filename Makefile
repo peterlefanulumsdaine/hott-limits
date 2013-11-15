@@ -4,7 +4,7 @@
 # The modules to be compiled by default.  
 # For these, just call “make” at the commandline.
 # For now, includes everything that compiles successfully and in reasonable time; happily, this also includes everything required as a dependency by other files.
-default: pullbacks limits
+default: limits sequences
 
 # All modules (invoked by “make all”).
 all: auxiliary arith fundamentals limits-common pullbacks limits pointedtypes sequences twopullbacks
