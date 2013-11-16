@@ -14,14 +14,6 @@ Require Import HoTT EquivalenceVarieties.
 
 Require Import Auxiliary Pullbacks.
 
-(* TODO (high): move to aux; and consider name. *)
-Lemma moveR_I {AA BB : Type} (ff : AA -> BB) {H : IsEquiv ff} (x : AA) (y : BB)
-  : y = ff x -> ff ^-1 y = x.
-Proof.
-  intros H_eq.  path_via (ff ^-1 (ff x)).
-  apply ap, H_eq.  apply eissect.
-Defined.
-
 (*******************************************************************************
 
 The *abstract* two pullbacks lemma.
@@ -40,11 +32,7 @@ Below we give three approaches.
 A naming convention we mostly adhere to: cones over the right-hand 
 square (f,g) are named [C1], [C1'], etc; cones over the left-hand square
 (or similar squares) are [C2], [C2'], etc; and cones over the whole
-rectangle as [C3], etc. (TODO (mid): this convention is currently far
-from consistently used. Make it more so!)
-
-TODO (high): keep organising, cleaning up this file, and (above all!)
-improving compilation time, if possible.
+rectangle as [C3], etc. 
 
 *******************************************************************************)
 
@@ -436,11 +424,6 @@ Proof.
   apply ap_idmap. *)
 Admitted.
 (* This succeeds during proof-building, but fails to pass the [Defined.]
-TODO (high): make it compile!  Ideas for doing so:
-- try to cut down on unfolds / reorder them more explicitly;
-- move the [path_via map_to_pullback_to_cospan_cone] and subsequent tactics
-  forwards
-- …?
 *)
 
 Lemma compose_cospan_cones_UP_first_version
@@ -448,12 +431,6 @@ Lemma compose_cospan_cones_UP_first_version
   : is_pullback_cone (compose_cospan_cones P1 P2).
 Proof.
   intros X.
-(* TODO: figure out what’s going on with “The conversion test raises an anomaly” and fix this!
-  rewrite <- (path_forall (compose_cospan_cones_UP_equiv_path P1 P2 X)).
-  apply (equiv_isequiv
-    (compose_cospan_cones_UP_equiv2 P1 P2 X)).
-Qed.
-*)
 Admitted.
 
 End Approach2.
@@ -479,7 +456,6 @@ Proof.
   intros C3.
   set (C1_UP_at_X := BuildEquiv (pullback_cone_UP P1 X)).
   set (C2_UP_at_X := BuildEquiv (pullback_cone_UP P2 X)).
-  (* TODO (mid): reconsider implicit arguments of [mk_cospan_cone]. *)
   set (cone_to_f_g := (@mk_cospan_cone _ _ _ f g X _ _ (cospan_cone_comm C3))).
   (* For the eventual ap, use the universal property of the left-hand square. *)
   apply (C2_UP_at_X ^-1).
@@ -569,7 +545,7 @@ Proof.
   path_via' (ap10 (path_forall (fun x0 => (cospan_cone_comm C2 (m x0))^^)) x).
     path_via' ((cospan_cone_comm C2 (m x))^^).
       apply inverse, inv_V.
-    apply inverse. (*TODO (mid): make args of [eisretr] implicit. *)
+    apply inverse.
     revert x. apply apD10. apply eisretr.
   apply (ap
     (fun p : (fun x0 => cospan_cone_map2 P1 (cospan_cone_map1 C2 (m x0)))
@@ -612,8 +588,6 @@ Proof.
   rewrite concat_pp_p.
   apply moveL_Mp. apply moveL_pM.
   rewrite inv_V.
-  (* TODO (mid): remove these last 3-4 lines and fiddle with calculation
-     below. *)
 
   set (C1' := @mk_cospan_cone _ _ _ f g _ _ _ (cospan_cone_comm C4)).
   set (C2' :=
@@ -758,8 +732,6 @@ Proof.
   unfold compose_cospan_cones_UP_inverse.
   fold C1_UP_at_X. fold C2_UP_at_X.  unfold compose.  simpl.
     apply moveR_I.  simpl.
-  (* TODO (mid): look to see if [moveR_E] can be used to simplify things
-  elsewhere. *)
   apply cospan_cone_path'. simpl.
     exists (UP_inverse_compose_cospan_cones P1 P2 m4).
     exists 1.
@@ -776,7 +748,6 @@ Proof.
   rewrite ap_inverse_o_equiv.
   rewrite !ap_pp. rewrite !ap10_pp.
   rewrite !concat_pp_p.
-  (* TODO (low): try to fold next three tactics into something more readable. *)
   set (p := ap10
      (ap cospan_cone_map2
         (eisretr C1_UP_at_X
@@ -787,7 +758,6 @@ Proof.
   apply whiskerL.
   unfold map_to_cospan_cone__compose_cospan_cones, cospan_cone_path'.
   rewrite cospan_cone_path_map2. simpl.
-(* TODO: write better [funext_compute]. *)
   assert (H : ap10 (path_forall (fun x0 => (cospan_cone_comm P2 (m4 x0))^)) x
               = (cospan_cone_comm P2 (m4 x))^).
     clear p. revert x. apply apD10. apply eisretr.

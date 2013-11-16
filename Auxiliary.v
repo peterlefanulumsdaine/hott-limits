@@ -258,6 +258,13 @@ Fixpoint iterate_dep {A:Type} (f:A->A) (B:A->Type)
      | O => y
      | S n' => g _ (iterate_dep _ _ g n' x y) end.
 
+Lemma moveR_I {AA BB : Type} (ff : AA -> BB) {H : IsEquiv ff} (x : AA) (y : BB)
+  : y = ff x -> ff ^-1 y = x.
+Proof.
+  intros H_eq.  path_via (ff ^-1 (ff x)).
+  apply ap, H_eq.  apply eissect.
+Defined.
+
 End Varia.
 
 Notation "A /\ B" := (A * B).
