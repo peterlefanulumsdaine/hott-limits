@@ -114,35 +114,6 @@ Proof.
   apply pullback_resp_equiv_A.
 Defined.
 
-(* We also need to know how this interacts with the functoriality of Omega. *)
-Lemma long_exact_seq_naturality {X Y : pointed_type} (f:Y .-> X)
-: Omega_ptd_fmap f
-  == (long_exact_thm f)
-     o pt_map _ _ (hfiber_incl_ptd (hfiber_incl_ptd (hfiber_incl_ptd f)))
-     o ((long_exact_thm (hfiber_incl_ptd f)) ^-1).
-Proof.
-(*
-  intros p. unfold long_exact_thm. simpl.
-  unfold equiv_inv at 1, loop_is_pullback. simpl.
-  unfold compose. simpl.
-  unfold equiv_compose.
-*)
-Admitted.
-
-(*******************************************************************************
-Application of the LES: equivalence of loop spaces, via truncatedness of fibers.
-
-Goal of the section: if [X -> Y] has [n]-truncated fibers, then
-[Omega ^n X <~> Omega ^n Y].
-*******************************************************************************)
-
-Corollary isequiv_loop_space_map_from_trunc_fiber
-  {Y X} (f : Y .-> X)
-  {n:nat} (Hn : forall x:X, IsTrunc n (hfiber f x))
-: IsEquiv (Omega_ptd_fmap_iterate f n).
-Proof.
-Admitted.
-
 (*
 Local Variables:
 coq-prog-name: "hoqtop"
