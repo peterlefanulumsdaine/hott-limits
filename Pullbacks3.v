@@ -40,19 +40,16 @@ Section Abstract_Two_Pullbacks_Lemma.
 
 Context {A B1 B2 C : Type} (f : A -> C) (g : B1 -> C) (h : B2 -> B1).
 
-Definition compose_cospan_cones {P1 : Type} (C1 : cospan_cone f g P1)
-  {P2 : Type} (C2: cospan_cone (cospan_cone_map2 C1) h P2)
-: cospan_cone f (g o h) P2.
+Lemma left_cospan_cone_to_composite {P1 : Type} (C1 : cospan_cone f g P1)
+  {X : Type} (C2 : cospan_cone (cospan_cone_map2 C1) h X)
+: cospan_cone f (g o h) X.
 Proof.
-  set (j1 := cospan_cone_map1 C1).
-  set (alpha1 := cospan_cone_comm C1).
-  set (j2 := cospan_cone_map1 C2).
-  set (k2 := cospan_cone_map2 C2).
-  set (alpha2 := cospan_cone_comm C2).
-  exists (j1 o j2). exists k2. intros x.
-  apply (concat (alpha1 (j2 x)) (ap g (alpha2 _))).
+  exists (cospan_cone_map1 C1 o cospan_cone_map1 C2).
+  exists (cospan_cone_map2 C2).
+  intros x.
+  apply (concat (cospan_cone_comm C1 (cospan_cone_map1 C2 x))).
+  apply (ap g (cospan_cone_comm C2 x)).
 Defined.
-
 
 (*******************************************************************************
 
@@ -87,17 +84,6 @@ properties are equivalent.
 *******************************************************************************)
 
 Section Approach1.
-
-Lemma left_cospan_cone_to_composite {P1 : Type} (C1 : cospan_cone f g P1)
-  {X : Type} (C2 : cospan_cone (cospan_cone_map2 C1) h X)
-: cospan_cone f (g o h) X.
-Proof.
-  exists (cospan_cone_map1 C1 o cospan_cone_map1 C2).
-  exists (cospan_cone_map2 C2).
-  intros x.
-  apply (concat (cospan_cone_comm C1 (cospan_cone_map1 C2 x))).
-  apply (ap g (cospan_cone_comm C2 x)).
-Defined.
 
 Lemma two_pullback_triangle_commutes {P1 : Type} (C1 : cospan_cone f g P1)
   {P2 : Type} (C2 : cospan_cone (cospan_cone_map2 C1) h P2)
@@ -278,7 +264,7 @@ Definition cospan_cone_map_to_pullback_equiv {A B C : Type}
   := equiv_inverse (BuildEquiv (pullback_universal f g X))
 : (cospan_cone f g X) <~> (X -> pullback f g).
 
-Lemma compose_cospan_cones_UP_equiv
+Lemma left_cospan_cone_to_composite_UP_equiv
   (P1 : abstract_pullback f g)
   (P2 : abstract_pullback (cospan_cone_map2 P1) h) (X : UU)
 : (X -> P2) <~> (cospan_cone f (g o h) X).
@@ -304,7 +290,7 @@ Proof.
 Defined.
 
 (* Try a more direct version. *)
-Lemma compose_cospan_cones_UP_equiv2
+Lemma left_cospan_cone_to_composite_UP_equiv2
   (P1 : abstract_pullback f g)
   (P2 : abstract_pullback (cospan_cone_map2 P1) h) (X : UU)
 : (X -> P2) <~> (cospan_cone f (g o h) X).
@@ -329,16 +315,16 @@ Proof.
   apply (equiv_inverse (cospan_cone_map_to_pullback_equiv _ _ _)).
 Defined.
 
-Lemma compose_cospan_cones_UP_equiv_path
+Lemma left_cospan_cone_to_composite_UP_equiv_path
   (P1 : abstract_pullback f g)
   (P2 : abstract_pullback (cospan_cone_map2 P1) h) (X : UU)
-: equiv_fun (compose_cospan_cones_UP_equiv2 P1 P2 X)
+: equiv_fun (left_cospan_cone_to_composite_UP_equiv2 P1 P2 X)
   ==
-   map_to_cospan_cone (compose_cospan_cones P1 P2) X.
+   map_to_cospan_cone (left_cospan_cone_to_composite P1 P2) X.
 Proof.
 (*
   intros alpha.
-  unfold compose_cospan_cones_UP_equiv2, compose_cospan_cones,
+  unfold left_cospan_cone_to_composite_UP_equiv2, left_cospan_cone_to_composite,
     map_to_cospan_cone.
   simpl. unfold compose. simpl.
   unfold pullback_pr2, pullback_pr1. simpl.
@@ -426,9 +412,9 @@ Admitted.
 (* This succeeds during proof-building, but fails to pass the [Defined.]
 *)
 
-Lemma compose_cospan_cones_UP_first_version
+Lemma left_cospan_cone_to_composite_UP_first_version
   (P1 : abstract_pullback f g) (P2 : abstract_pullback (cospan_cone_map2 P1) h)
-  : is_pullback_cone (compose_cospan_cones P1 P2).
+  : is_pullback_cone (left_cospan_cone_to_composite P1 P2).
 Proof.
   intros X.
 Admitted.
@@ -448,7 +434,7 @@ universal property.
 
 Section Approach3.
 
-Lemma compose_cospan_cones_UP_inverse
+Lemma left_cospan_cone_to_composite_UP_inverse
   (P1 : abstract_pullback f g)
   (P2 : abstract_pullback (cospan_cone_map2 P1) h) (X : UU)
 : cospan_cone f (g o h) X -> (X -> P2).
@@ -471,25 +457,25 @@ Proof.
   apply ap10. apply packed_cospan_cone_map2.
 Defined.
 
-Lemma compose_cospan_cones_aux1
+Lemma left_cospan_cone_to_composite_aux1
   (P1 : abstract_pullback f g) (P2 : abstract_pullback (cospan_cone_map2 P1) h)
   (X : Type)  (C4 : cospan_cone f (g o h) X)
-: cospan_cone_map1 (map_to_cospan_cone (compose_cospan_cones P1 P2) X
-    (compose_cospan_cones_UP_inverse P1 P2 X C4))
+: cospan_cone_map1 (map_to_cospan_cone (left_cospan_cone_to_composite P1 P2) X
+    (left_cospan_cone_to_composite_UP_inverse P1 P2 X C4))
   = cospan_cone_map1 C4.
 Proof.
   set (C1_UP_at_X := BuildEquiv (pullback_cone_UP P1 X)).
   set (C2_UP_at_X := BuildEquiv (pullback_cone_UP P2 X)).
 
-  change (cospan_cone_map1 (map_to_cospan_cone (compose_cospan_cones P1 P2) X
-     (compose_cospan_cones_UP_inverse P1 P2 X C4)))
+  change (cospan_cone_map1 (map_to_cospan_cone (left_cospan_cone_to_composite P1 P2) X
+     (left_cospan_cone_to_composite_UP_inverse P1 P2 X C4)))
   with (cospan_cone_map1 P1 o (cospan_cone_map1 P2
-    o compose_cospan_cones_UP_inverse P1 P2 X C4)).
+    o left_cospan_cone_to_composite_UP_inverse P1 P2 X C4)).
 
   change (compose (cospan_cone_map1 P1)) with (cospan_cone_map1 o C1_UP_at_X).
   change (compose (cospan_cone_map1 P2)) with (cospan_cone_map1 o C2_UP_at_X).
 
-  unfold compose_cospan_cones_UP_inverse. fold C2_UP_at_X C1_UP_at_X.
+  unfold left_cospan_cone_to_composite_UP_inverse. fold C2_UP_at_X C1_UP_at_X.
 
   path_via
     ((cospan_cone_map1 o C1_UP_at_X) ((C1_UP_at_X ^-1)
@@ -498,34 +484,34 @@ Proof.
   apply (packed_cospan_cone_map1 P1).
 Defined.
 
-Lemma compose_cospan_cones_aux2
+Lemma left_cospan_cone_to_composite_aux2
   (P1 : abstract_pullback f g) (P2 : abstract_pullback (cospan_cone_map2 P1) h)
   (X : UU)  (C4 : cospan_cone f (g o h) X)
-:  cospan_cone_map2 (map_to_cospan_cone (compose_cospan_cones P1 P2) X
-     (compose_cospan_cones_UP_inverse P1 P2 X C4)) =
+:  cospan_cone_map2 (map_to_cospan_cone (left_cospan_cone_to_composite P1 P2) X
+     (left_cospan_cone_to_composite_UP_inverse P1 P2 X C4)) =
    cospan_cone_map2 C4.
 Proof.
   set (C1_UP_at_X := BuildEquiv (pullback_cone_UP P1 X)).
   set (C2_UP_at_X := BuildEquiv (pullback_cone_UP P2 X)).
-  unfold compose_cospan_cones. unfold cospan_cone_map2 at 1. simpl.
+  unfold left_cospan_cone_to_composite. unfold cospan_cone_map2 at 1. simpl.
 
   change (compose (cospan_cone_map2 P2)) with (cospan_cone_map2 o C2_UP_at_X).
-  unfold compose_cospan_cones_UP_inverse. fold C1_UP_at_X C2_UP_at_X.
+  unfold left_cospan_cone_to_composite_UP_inverse. fold C1_UP_at_X C2_UP_at_X.
   apply (packed_cospan_cone_map2 P2).
 Defined.
 
-Lemma map_to_cospan_cone__compose_cospan_cones
+Lemma map_to_cospan_cone__left_cospan_cone_to_composite
   (P1 : abstract_pullback f g)
   {P2 : Type} (C2 : cospan_cone (cospan_cone_map2 P1) h P2)
   {X : Type} (m : X -> P2)
 : @mk_cospan_cone _ _ _ f g _ _ _
-    (cospan_cone_comm (map_to_cospan_cone (compose_cospan_cones P1 C2) X m))
+    (cospan_cone_comm (map_to_cospan_cone (left_cospan_cone_to_composite P1 C2) X m))
   = map_to_cospan_cone P1 X (cospan_cone_map1 (map_to_cospan_cone C2 X m)).
 Proof.
   change (@mk_cospan_cone _ _ _ f g _ _ _
-    (cospan_cone_comm (map_to_cospan_cone (compose_cospan_cones P1 C2) X m)))
+    (cospan_cone_comm (map_to_cospan_cone (left_cospan_cone_to_composite P1 C2) X m)))
   with (@mk_cospan_cone _ _ _ f g _ _ _
-    (fun x => cospan_cone_comm (compose_cospan_cones P1 C2) (m x))).
+    (fun x => cospan_cone_comm (left_cospan_cone_to_composite P1 C2) (m x))).
   change (map_to_cospan_cone P1 X
       (cospan_cone_map1 (map_to_cospan_cone C2 X m)))
   with (map_to_cospan_cone P1 X ((cospan_cone_map1 C2) o m)).
@@ -554,35 +540,35 @@ Proof.
   apply path_forall_V.
 Defined.
 
-Lemma UP_inverse_compose_cospan_cones
+Lemma UP_inverse_left_cospan_cone_to_composite
   (P1 : abstract_pullback f g)
   {P2 : Type} (C2 : cospan_cone (cospan_cone_map2 P1) h P2)
   {X : UU} (m : X -> P2)
 : ((BuildEquiv (pullback_cone_UP P1 X)) ^-1)
       (@mk_cospan_cone _ _ _ f g _ _ _
          (cospan_cone_comm (map_to_cospan_cone
-           (compose_cospan_cones P1 C2) X m))) =
+           (left_cospan_cone_to_composite P1 C2) X m))) =
       cospan_cone_map1 C2 o m.
 Proof.
   apply moveR_E. simpl.
-  apply map_to_cospan_cone__compose_cospan_cones.
+  apply map_to_cospan_cone__left_cospan_cone_to_composite.
 Defined.
 
-Lemma compose_cospan_cones_UP_inverse_is_section
+Lemma left_cospan_cone_to_composite_UP_inverse_is_section
   (P1 : abstract_pullback f g) (P2 : abstract_pullback (cospan_cone_map2 P1) h)
   (X : Type)
-: (map_to_cospan_cone (compose_cospan_cones P1 P2) X)
-    o (compose_cospan_cones_UP_inverse P1 P2 X)
+: (map_to_cospan_cone (left_cospan_cone_to_composite P1 P2) X)
+    o (left_cospan_cone_to_composite_UP_inverse P1 P2 X)
   == idmap.
 Proof.
   set (C1_UP_at_X := BuildEquiv (pullback_cone_UP P1 X)).
   set (C2_UP_at_X := BuildEquiv (pullback_cone_UP P2 X)).
 
   intros C4.
-  apply (cospan_cone_path (compose_cospan_cones_aux1 _ _ _ _)
-    (compose_cospan_cones_aux2 _ _ _ _)).
+  apply (cospan_cone_path (left_cospan_cone_to_composite_aux1 _ _ _ _)
+    (left_cospan_cone_to_composite_aux2 _ _ _ _)).
   intros x.
-  unfold cospan_cone_comm. unfold compose_cospan_cones. simpl.
+  unfold cospan_cone_comm. unfold left_cospan_cone_to_composite. simpl.
   unfold cospan_cone_comm. simpl.
   fold (cospan_cone_comm C4) (cospan_cone_comm P1) (cospan_cone_comm P2).
   rewrite concat_pp_p.
@@ -718,25 +704,25 @@ Proof.
   apply H4.
 Qed.
 
-Lemma compose_cospan_cones_UP_inverse_is_retraction
+Lemma left_cospan_cone_to_composite_UP_inverse_is_retraction
   (P1 : abstract_pullback f g) (P2 : abstract_pullback (cospan_cone_map2 P1) h)
   (X : Type)
-: (compose_cospan_cones_UP_inverse P1 P2 X)
-    o (map_to_cospan_cone (compose_cospan_cones P1 P2) X)
+: (left_cospan_cone_to_composite_UP_inverse P1 P2 X)
+    o (map_to_cospan_cone (left_cospan_cone_to_composite P1 P2) X)
   == idmap.
 
 Proof.
   set (C1_UP_at_X := BuildEquiv (pullback_cone_UP P1 X)).
   set (C2_UP_at_X := BuildEquiv (pullback_cone_UP P2 X)).
   intros m4. (* corresponds to C4 in previous direction *)
-  unfold compose_cospan_cones_UP_inverse.
+  unfold left_cospan_cone_to_composite_UP_inverse.
   fold C1_UP_at_X. fold C2_UP_at_X.  unfold compose.  simpl.
     apply moveR_I.  simpl.
   apply cospan_cone_path'. simpl.
-    exists (UP_inverse_compose_cospan_cones P1 P2 m4).
+    exists (UP_inverse_left_cospan_cone_to_composite P1 P2 m4).
     exists 1.
   intros x. apply (concatR (concat_p1 _)^).
-  unfold cospan_cone_comm, UP_inverse_compose_cospan_cones. simpl.
+  unfold cospan_cone_comm, UP_inverse_left_cospan_cone_to_composite. simpl.
   fold C1_UP_at_X.
   rewrite ap_ap10.
   unfold packed_cospan_cone_map2. fold C1_UP_at_X.
@@ -752,11 +738,11 @@ Proof.
      (ap cospan_cone_map2
         (eisretr C1_UP_at_X
            (@mk_cospan_cone _ _ _ f g _ _ _
-              (fun z : X => cospan_cone_comm (compose_cospan_cones P1 P2)
+              (fun z : X => cospan_cone_comm (left_cospan_cone_to_composite P1 P2)
                   (m4 z))))) x).
   path_via' (p @ 1). apply inverse, concat_p1.
   apply whiskerL.
-  unfold map_to_cospan_cone__compose_cospan_cones, cospan_cone_path'.
+  unfold map_to_cospan_cone__left_cospan_cone_to_composite, cospan_cone_path'.
   rewrite cospan_cone_path_map2. simpl.
   assert (H : ap10 (path_forall (fun x0 => (cospan_cone_comm P2 (m4 x0))^)) x
               = (cospan_cone_comm P2 (m4 x))^).
@@ -778,15 +764,15 @@ Proof.
   exact 1.
 Qed.
 
-Lemma compose_cospan_cones_UP
+Lemma left_cospan_cone_to_composite_UP
   (P1 : abstract_pullback f g) (P2 : abstract_pullback (cospan_cone_map2 P1) h)
-: is_pullback_cone (compose_cospan_cones P1 P2).
+: is_pullback_cone (left_cospan_cone_to_composite P1 P2).
 Proof.
   intros X.
   apply (isequiv_adjointify
-    (compose_cospan_cones_UP_inverse P1 P2 X)).
-  apply compose_cospan_cones_UP_inverse_is_section.
-  apply compose_cospan_cones_UP_inverse_is_retraction.
+    (left_cospan_cone_to_composite_UP_inverse P1 P2 X)).
+  apply left_cospan_cone_to_composite_UP_inverse_is_section.
+  apply left_cospan_cone_to_composite_UP_inverse_is_retraction.
 Qed.
 
 End Approach3.
