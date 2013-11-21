@@ -31,7 +31,7 @@ If `hoqc` is not in your system path, you will need to pass its location explici
 
     make COQC=/path/to/hoqc
 
-By default, `make` omits the file `Pullbacks3.v`, which includes the alternate versions of the abstract two pullbacks lemma, and is very slow to compile.  To include this as well, run `make all`.
+By default, `make` omits the files `Pullbacks3.v` (slow to compile) and `Pullbacks3_alt.v` (extremely slow).  To include these, run `make twopullbacks`, `make twopullbacksalt`, or `make all`.
 
 # Organization #
 
@@ -40,8 +40,8 @@ The files in the library are as follows:
 - Auxiliary.v: general-purpose lemmas, not morally part of our development but required by it.
 - Fundamentals.v: fundamental constructions of the fibration category structure on types.
 - Limits-common.v, Equalizers.v: core constructions used in the (otherwise independent) Pullbacks and Limits files.
-- Pullbacks.v, Pullbacks2.v: the basic theory of (homotopy) pullbacks.
-- Pullbacks3.v: alternative approaches to the abstract two pullbacks lemma.
+- Pullbacks.v, Pullbacks2.v, Pullbacks3.v: the basic theory of (homotopy) pullbacks.
+- Pullbacks3_alt.v: alternative approaches to the abstract two pullbacks lemma.
 - Limits.v, Limits2.v: the basic theory of limits over graphs, with examples.
 - Arith.v: a very bare-bones development of the natural numbers.
 - PointedTypes.v: basic definitions regarding pointed types.

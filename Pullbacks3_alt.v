@@ -4,7 +4,8 @@ Title: Pullbacks3.v
 Authors: Jeremy Avigad, Chris Kapulkin, Peter LeFanu Lumsdaine
 Date: 1 March 2013
 
-The (abstract) two pullbacks lemma.
+Alternative approaches to the (abstract) two pullbacks lemma, as discussed
+in the paper.
 
 *******************************************************************************)
 
