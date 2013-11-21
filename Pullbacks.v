@@ -247,6 +247,32 @@ Proof.
   apply (pr2_triple_path _ Phi1 Phi2).
 Defined.
 
+Lemma cospan_cone_path'_map1
+  {A B C : Type} {f : A -> C} {g : B -> C} 
+  {X : Type} {Phi1 Phi2 : cospan_cone f g X}
+  (pqr : {p : cospan_cone_map1 Phi1 = cospan_cone_map1 Phi2 &
+         {q : cospan_cone_map2 Phi1 = cospan_cone_map2 Phi2 &
+         forall x : X, cospan_cone_comm Phi1 x
+           = (ap f (ap10 p x) @ cospan_cone_comm Phi2 x)
+             @ (ap g (ap10 q x)) ^}})
+: ap cospan_cone_map1 (cospan_cone_path' pqr) = pr1 pqr. 
+Proof.
+  apply cospan_cone_path_map1.
+Defined.
+
+Lemma cospan_cone_path'_map2
+  {A B C : Type} {f : A -> C} {g : B -> C} 
+  {X : Type} {Phi1 Phi2 : cospan_cone f g X}
+  (pqr : {p : cospan_cone_map1 Phi1 = cospan_cone_map1 Phi2 &
+         {q : cospan_cone_map2 Phi1 = cospan_cone_map2 Phi2 &
+         forall x : X, cospan_cone_comm Phi1 x
+           = (ap f (ap10 p x) @ cospan_cone_comm Phi2 x)
+             @ (ap g (ap10 q x)) ^}})
+: ap cospan_cone_map2 (cospan_cone_path' pqr) = pr1 (pr2 pqr). 
+Proof.
+  apply cospan_cone_path_map2.
+Defined.
+
 End Cospan_Cone.
 
 
