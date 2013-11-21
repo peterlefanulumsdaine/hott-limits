@@ -7,7 +7,7 @@
 default: limits sequences
 
 # All modules (invoked by “make all”).
-all: auxiliary arith fundamentals limits-common pullbacks limits pointedtypes sequences twopullbacks
+all: auxiliary arith fundamentals limits-common pullbacks limits pointedtypes sequences twopullbacks twopullbacksalt
 
 # Command to be used for compiling coq files.
 # Change this locally if eg “hoqc” doesn’t resolve correctly on your system.
@@ -31,6 +31,9 @@ pullbacks: limits-common
 
 twopullbacks: pullbacks
 	$(COQC) Pullbacks3.v
+
+twopullbacksalt: pullbacks
+	$(COQC) Pullbacks3_alt.v
 
 limits: limits-common arith pullbacks
 	$(COQC) Limits.v Limits2.v
