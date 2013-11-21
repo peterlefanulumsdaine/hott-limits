@@ -14,7 +14,6 @@ Require Import HoTT EquivalenceVarieties.
 
 Require Import Auxiliary Fundamentals Pullbacks Equalizers.
 
-
 (*******************************************************************************
 
 Example of pullbacks:
@@ -219,6 +218,8 @@ equivalent to an hfiber of [g] itself.
 
 *******************************************************************************)
 
+Section Stable_properties.
+
 Lemma hfiber_of_pullback {A B C:Type} (f:A->C) (g:B->C)
 : forall a:A, hfiber (f^* g) a <~> hfiber g (f a).
 Proof.
@@ -255,6 +256,8 @@ Proof.
   apply equiv_inverse. apply hfiber_of_pullback.
   apply g_is_fiberwise_P.
 Defined.
+
+End Stable_properties.
 
 (*
 Local Variables:
