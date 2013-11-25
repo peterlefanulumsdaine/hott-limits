@@ -119,7 +119,7 @@ Proof.
 Defined.
 
 (* If [Z -g-> Y -f-> X] are pointed maps, a (pointed) nullhomotopy of the
-composite induces a factorisation of [Z] through the fiber of [f].  *)
+composite induces a factorisation of [g] through the fiber of [f].  *)
 Definition hfiber_factorisation {Z Y X}
   (g : Z .-> Y) (f : Y .-> X) (H : compose_ptd f g .== point)
 : Z .-> (hfiber_ptd f).
@@ -134,7 +134,8 @@ Proof.
   apply concat_p1.
 Defined.
 
-(* TODO (mid): show that this is a factorisation of [f], i.e. [compose_ptd  *)
+(* TODO (mid): show that this is a factorisation of [g], i.e. that 
+[compose_ptd (hfiber_incl f) (hfiber_factorisation g f H) .== g].  *)
 
 (* A pair of pointed maps, together with a nullhomotopy of their composite,
 is called "exact" if the induced map to the hfiber is an equivalence. *)
@@ -144,6 +145,15 @@ Definition is_exact {Z Y X} (g : Z .-> Y) (f : Y .-> X)
 (* Note that this really can depend on [H], not just on [f] and [g].
 Consider the sequence [Int -> 1 -> S1]: with the nullhomotopy
 [fun n => loop ^n], it is exact, but with [fun _ => refl], it is not. *)
+
+Definition is_exact_hfiber {Y X} (f : Y .-> X)
+  : is_exact (hfiber_incl_ptd f) f (hfiber_null f).
+Proof.
+  unfold is_exact.
+  apply isequiv_homotopic with (idmap_ptd _).
+  apply isequiv_idmap.
+  intros [y p]; exact 1.
+Defined.
 
 End Pointed_Types_Examples.
 

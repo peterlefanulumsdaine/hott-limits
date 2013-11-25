@@ -125,24 +125,16 @@ Proof.
   exists B. exists (hfiber_ptd f). apply hfiber_incl_ptd.
 Defined.
 
-Definition hfiber_sequence_obs {A B} (f : B .-> A) (n:nat) : pointed_type
-  := pr1 (hfiber_sequence_aux f n).
-
-Definition hfiber_sequence_maps {A B} (f : B .-> A) (n:nat)
-  : hfiber_sequence_obs f (1+n) .-> hfiber_sequence_obs f n
-  := (pr2 (pr2 (hfiber_sequence_aux f n))).
-
-Definition hfiber_sequence_null {A B} (f : B .-> A) (n:nat)
-  : compose_ptd (hfiber_sequence_maps f n) (hfiber_sequence_maps f (1+n))
-    .== point.
-Proof.
-  admit.
-Defined.
-
 Definition hfiber_sequence {A B} (f : B .-> A) : long_sequence
-:= {| seq_obs := hfiber_sequence_obs f;
-      seq_maps := hfiber_sequence_maps f;
-      seq_null := hfiber_sequence_null f |}.
+:= {| seq_obs n := pr1 (hfiber_sequence_aux f n);
+      seq_maps n := pr2 (pr2 (hfiber_sequence_aux f n));
+      seq_null n := hfiber_null _ |}.
+
+Lemma is_exact_hfiber_sequence {A B} (f : B .-> A)
+  : lseq_is_exact (hfiber_sequence f).
+Proof.
+  intro; apply (is_exact_hfiber_incl _).
+Qed.
 
 End Hfiber_Sequence.
 
@@ -160,7 +152,7 @@ Long exact sequence.
 
 (* TODO (high): make this a pointed equivalence!  Possibly also rewrite this
 to make the underlying map explicit. *)
-Theorem long_exact_thm
+Lemma long_exact_lemma
 : forall {X Y : pointed_type} (f:Y.->X),
     (pt_type (hfiber_ptd (hfiber_incl_ptd f)))
     <~> Omega_ptd X.
@@ -194,20 +186,34 @@ Proof.
   apply pullback_resp_equiv_A.
 Defined.
 
-(* We also need to know how this interacts with the functoriality of Omega. *)
-Lemma long_exact_seq_naturality {X Y : pointed_type} (f:Y .-> X)
-: Omega_ptd_fmap f
-  == (long_exact_thm f)
-     o pt_map _ _ (hfiber_incl_ptd (hfiber_incl_ptd (hfiber_incl_ptd f)))
-     o ((long_exact_thm (hfiber_incl_ptd f)) ^-1).
-Proof.
-(*
-  intros p. unfold long_exact_thm. simpl.
-  unfold equiv_inv at 1, loop_is_pullback. simpl.
-  unfold compose. simpl.
-  unfold equiv_compose.
-*)
+(* TODO (high): move; and check naming convention *)
+Definition Omega_ptd_fmap_isequiv {A B : pointed_type} (f : A .-> B) (f_iseq : IsEquiv f)
+: IsEquiv (Omega_ptd_fmap f).
 Admitted.
+
+Lemma long_exact_sequence_aux1 {X Y} (f : Y .-> X) (n:nat)
+  : hfiber_sequence f (n*3) .-> (iterate Omega_ptd n) X.
+Proof.
+  induction n as [ | n' IH]; simpl.  
+  (* n=0 *) apply idmap_ptd.
+  (* n=S n' *)
+  apply @compose_ptd with (Y := Omega_ptd (hfiber_sequence f (n'*3))).
+  apply Omega_ptd_fmap, IH.
+  admit. (* TODO: split up [long_exact_lemma] to a pointed map and an IsEquiv. *)
+Defined.
+
+Lemma long_exact_sequence_aux2 {X Y} (f : Y .-> X) (n:nat)
+  : IsEquiv (long_exact_sequence_aux1 f n).
+Proof.
+  induction n as [ | n' IH]; simpl.  
+  (* n=0 *) apply isequiv_idmap.
+  (* n=S n' *)
+  apply @isequiv_compose with (B := Omega_ptd (hfiber_sequence f (n'*3))).
+  admit.  (* TODO: use second part of split-up LES lemma here *)
+  apply Omega_ptd_fmap_isequiv, IH.
+Qed.
+
+(* TODO: also show how this interacts with the functoriality of Omega. *)
 
 (*******************************************************************************
 Application of the LES: equivalence of loop spaces, via truncatedness of fibers.
