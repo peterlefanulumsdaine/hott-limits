@@ -97,7 +97,7 @@ Theorem long_exact_thm
     <~> Omega_ptd X.
 Proof.
   intros. simpl.
-  set (y := point Y). set (x := point X).
+  set (y := @point Y). set (x := @point X).
   equiv_via (pullback (name x) (name x)). Focus 2.
     apply equiv_inverse. apply loop_is_pullback.
   equiv_via (pullback (hfiber_incl f x) (name y)).

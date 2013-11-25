@@ -22,14 +22,15 @@ Pointed types.
 (* TODO (high): consistentize use of capital letters, throughout development *)
 Section Pointed_Types.
 
-(* TODO (low): would these be better just as sigma-types, maybe? *)
 Record pointed_type := mk_pointed_type {
   pt_type :> Type;
   point : pt_type }.
 
+Global Arguments point [X] : rename.
+
 Record pointed_map (X Y : pointed_type) := mk_pointed_map {
   pt_map :> X -> Y;
-  pt_map_pt : pt_map (point X) = point Y }.
+  pt_map_pt : pt_map point = point }.
 
 Global Arguments pt_map_pt [X Y] f : rename.
 Global Arguments mk_pointed_map [X Y] f alpha : rename.
@@ -37,7 +38,7 @@ Global Arguments mk_pointed_map [X Y] f alpha : rename.
 Record pointed_htpy {X Y} (f g : pointed_map X Y)
 := mk_pointed_htpy {
   pt_htpy :> f == g;
-  pt_htpy_pt : pt_htpy (point X) = (pt_map_pt f) @ (pt_map_pt g)^ }.
+  pt_htpy_pt : pt_htpy point = (pt_map_pt f) @ (pt_map_pt g)^ }.
 
 Global Arguments pt_htpy [X Y f g] H x : rename.
 (* [pt_htpy] seems not to work as coercion.  TODO: investigate? *)
@@ -71,14 +72,14 @@ Definition Unit_Ptd : pointed_type
 Canonical Structure Unit_Ptd.
 
 Definition hfiber_ptd {X Y : pointed_type} (f : X .-> Y) : pointed_type
-:= mk_pointed_type (hfiber f (point Y)) (point X; pt_map_pt f).
+:= mk_pointed_type (hfiber f point) (point; pt_map_pt f).
 
 (* TODO (mid): fix once issues (?what issues?) are cleared up. *)
 Canonical Structure hfiber_ptd.
 
 Definition hfiber_incl_ptd {X Y : pointed_type} (f : X .-> Y)
   : (hfiber_ptd f) .-> X
-:= @mk_pointed_map (hfiber_ptd f) X (hfiber_incl f (point Y)) 1.
+:= @mk_pointed_map (hfiber_ptd f) X (hfiber_incl f point) 1.
 
 End Pointed_Types_Examples.
 
@@ -92,7 +93,7 @@ sequences...
 Section Pointed_Maps.
 
 Definition pointed_map_ptd (X Y : pointed_type)
-:= mk_pointed_type (X .-> Y) ([pointed (fun _ => point Y)]).
+:= mk_pointed_type (X .-> Y) ([pointed (fun _ => point)]).
 
 Canonical Structure pointed_map_ptd.
 
@@ -106,28 +107,35 @@ Definition compose_ptd {X Y Z} (f : Y .-> Z) (g : X .-> Y)
 := {| pt_map := f o g ; pt_map_pt := (ap f (pt_map_pt g) @ pt_map_pt f) |}.
 
 Canonical Structure compose_ptd.
-(* Doesn't seem to work, e.g. in [is_exact] below.  TODO (low): investigate? *)
+(* Doesn't seem to work, e.g. in [is_exact] below.  TODO (low): investigate? 
+TODO (mid): in meantime, make notation [f .o g] for this?*)
 
-Definition null {X Y} (f : X .-> Y)
-:= f .== (point _).
-
+(* If [Z -g-> Y -f-> X] are pointed maps, a (pointed) nullhomotopy of the
+composite induces a factorisation of [Z] through the fiber of [f].  *)
 Definition hfiber_factorisation {Z Y X}
-  (g : Z .-> Y) (f : Y .-> X) (H : compose_ptd f g .== (point _))
+  (g : Z .-> Y) (f : Y .-> X) (H : compose_ptd f g .== point)
 : Z .-> (hfiber_ptd f).
 Proof.
   exists (fun z => ((g z); (pt_htpy H) z)).
   apply total_path'; simpl.
     exists (pt_map_pt g).
-  path_via ((ap f (pt_map_pt g))^ @ (pt_htpy H) (point Z)).
-    refine ((transport_compose (fun x => (x = point X)) _ _ _) @ _).
+  path_via ((ap f (pt_map_pt g))^ @ (pt_htpy H) point).
+    refine ((transport_compose (fun x => (x = point)) _ _ _) @ _).
     apply transport_paths_l.
   apply moveR_Vp. apply (concat (pt_htpy_pt H)); simpl.
   apply concat_p1.
 Defined.
 
+(* TODO (mid): show that this is a factorisation of [f], i.e. [compose_ptd  *)
+
+(* A pair of pointed maps, together with a nullhomotopy of their composite,
+is called "exact" if the induced map to the hfiber is an equivalence. *)
 Definition is_exact {Z Y X} (g : Z .-> Y) (f : Y .-> X)
-  (H : compose_ptd f g .== (point _))
+  (H : compose_ptd f g .== point)
 := IsEquiv (hfiber_factorisation g f H).
+(* Note that this really can depend on [H], not just on [f] and [g].
+Consider the sequence [Int -> 1 -> S1]: with the nullhomotopy
+[fun n => loop ^n], it is exact, but with [fun _ => refl], it is not. *)
 
 End Pointed_Maps.
 
@@ -143,10 +151,10 @@ Pullbacks2.v.
 Section Omega_Ptd.
 
 Definition Omega_ptd (A:pointed_type) : pointed_type
-:= {| pt_type := Omega A (point A);
-      point := idpath (point A) |}.
+:= {| pt_type := Omega A point;
+      point := idpath point |}.
 
-(* TODO (mid): fix once this issue is cleared up. *)
+(* TODO (mid): fix once this issue (?what issue?) is cleared up. *)
 (* Canonical Structure Omega_Ptd. *)
 
 Definition Omega_ptd_fmap {A B : pointed_type} (f : A .-> B)
