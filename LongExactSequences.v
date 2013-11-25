@@ -13,8 +13,9 @@ classical homotopy theory.
 
 Require Import HoTT EquivalenceVarieties.
 
-Require Import Auxiliary Fundamentals Pullbacks Pullbacks2 PointedTypes.
+Require Import Auxiliary Arith Fundamentals Pullbacks Pullbacks2 PointedTypes.
 
+Open Scope path_scope.
 
 (******************************************************************************
 
@@ -47,35 +48,103 @@ End Varia.
 
 (*******************************************************************************
 
-Pointed maps/short exact sequence.
-
-A (short) homotopy fiber sequence may be given in several equivalent ways:
-
-(a) a sequence F -> E -> B of maps of pointed types, together with an
-equivalence (pointed and over E) between F and the (pointed) homotopy
-fiber of E over the base;
-
-(b) a map E -> B of pointed types [from F may be recovered as the
-(pointed) homotopy fiber];
-
-(c) a map E -> B of types, and a point of E [from which, for (c), the
-point of B may be recovered as the image];
-
-(d) a pointed type (B,b0), and a map P : B -> Type, with a point of P
-b0 [from which, for (c), E may be recovered as the total space];
-
-…more?
-
-TODO (mid): consider which of these definitions will give the clearest
-versions of theorems and proofs. (c) seems most parsimonious; (b)
-gives perhaps the clearest categorical picture; (d) perhaps reduces
-how much use of homotopy fibers is required?
+General long sequences
 
 *******************************************************************************)
 
-(* TODO (mid), perhaps: equivalence of the various definitions [or... well,
-the full equivalence of all would require univalence... how much, if
-anything, should we do?]. *)
+Section Sequences.
+
+Record long_sequence := {
+  seq_obs :> nat -> pointed_type;
+  seq_maps : forall n:nat, seq_obs (1+n) .-> seq_obs n;
+  seq_null : forall n:nat, compose_ptd (seq_maps n) (seq_maps (1+n)) .== point }.
+
+Definition lseq_is_exact (X : long_sequence)
+  := forall n, is_exact (seq_maps X (1+n)) (seq_maps X n) (seq_null X n).
+
+End Sequences.
+
+(* Long sequences are often constructed inductively.  This is just a little
+delicate, due to the dependency between the types of the components.
+
+Here we give a typical example construction; this serves as a template for
+[hfiber_sequence] and [loop_space_sequence] below.  This template could of
+course be generalised to a precise theorem, but for the present applications,
+that would be more trouble than it's worth. *)
+
+Section Sequence_Template.  
+
+Hypothesis A0 : pointed_type.
+Hypothesis template_iterator_dom : forall A B (f : B .-> A), pointed_type.
+Arguments template_iterator_dom [A B] f.
+Hypothesis template_iterator_map : forall A B (f : B .-> A), (template_iterator_dom f) .-> B.
+Arguments template_iterator_map [A B] f.
+
+Definition template_aux (n:nat) : { A:pointed_type & {B : pointed_type & B .-> A}}.
+Proof.
+  induction n as [ | n' ABf].
+  (* n=0 *) exists A0; exists A0; apply idmap_ptd.
+  set (B := pr1 (pr2 ABf)).
+  set (f := pr2 (pr2 ABf)).
+  exists B. exists (template_iterator_dom f). exact (template_iterator_map f).
+Defined.
+
+Definition template_obs (n:nat) : pointed_type
+  := pr1 (template_aux n).
+
+Definition template_map (n:nat) : template_obs (1+n) .-> template_obs n.
+Proof.
+  unfold template_obs; simpl.
+  exact (pr2 (pr2 (template_aux n))).
+Defined.
+
+End Sequence_Template.
+
+
+(*******************************************************************************
+
+The fiber sequence of a pointed map
+
+We first construct the long exact sequence of a pointed map simply by iteratedly
+taking its fiber.  Constructed this way, it is evidently exact.  We then show,
+afterwards, that it is equivalent to a sequence of loop spaces.
+
+(TODO: do this last part.)
+
+*******************************************************************************)
+
+Section Hfiber_Sequence.
+
+Definition hfiber_sequence_aux {A0 B0} (f0 : B0 .-> A0) (n:nat)
+  : { A:pointed_type & {B : pointed_type & B .-> A}}.
+Proof.
+  induction n as [ | n' ABf].
+  (* n=0 *) exists A0; exists B0; exact f0.
+  (* n=1+n' *)
+  set (B := pr1 (pr2 ABf)). set (f := pr2 (pr2 ABf)).
+  exists B. exists (hfiber_ptd f). apply hfiber_incl_ptd.
+Defined.
+
+Definition hfiber_sequence_obs {A B} (f : B .-> A) (n:nat) : pointed_type
+  := pr1 (hfiber_sequence_aux f n).
+
+Definition hfiber_sequence_maps {A B} (f : B .-> A) (n:nat)
+  : hfiber_sequence_obs f (1+n) .-> hfiber_sequence_obs f n
+  := (pr2 (pr2 (hfiber_sequence_aux f n))).
+
+Definition hfiber_sequence_null {A B} (f : B .-> A) (n:nat)
+  : compose_ptd (hfiber_sequence_maps f n) (hfiber_sequence_maps f (1+n))
+    .== point.
+Proof.
+  admit.
+Defined.
+
+Definition hfiber_sequence {A B} (f : B .-> A) : long_sequence
+:= {| seq_obs := hfiber_sequence_obs f;
+      seq_maps := hfiber_sequence_maps f;
+      seq_null := hfiber_sequence_null f |}.
+
+End Hfiber_Sequence.
 
 (******************************************************************************
 Long exact sequence.

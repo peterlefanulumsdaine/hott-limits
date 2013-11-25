@@ -60,31 +60,6 @@ Notation "[ 'pointed' f ]" := {| pt_map := f; pt_map_pt := 1 |}
 
 (*******************************************************************************
 
-Some examples of pointed types.
-
-*******************************************************************************)
-
-Section Pointed_Types_Examples.
-
-Definition Unit_Ptd : pointed_type
-  := mk_pointed_type Unit tt.
-
-Canonical Structure Unit_Ptd.
-
-Definition hfiber_ptd {X Y : pointed_type} (f : X .-> Y) : pointed_type
-:= mk_pointed_type (hfiber f point) (point; pt_map_pt f).
-
-(* TODO (mid): fix once issues (?what issues?) are cleared up. *)
-Canonical Structure hfiber_ptd.
-
-Definition hfiber_incl_ptd {X Y : pointed_type} (f : X .-> Y)
-  : (hfiber_ptd f) .-> X
-:= @mk_pointed_map (hfiber_ptd f) X (hfiber_incl f point) 1.
-
-End Pointed_Types_Examples.
-
-(*******************************************************************************
-
 More on pointed maps: category structure, nullness, exactness,
 sequences...
 
@@ -109,6 +84,39 @@ Definition compose_ptd {X Y Z} (f : Y .-> Z) (g : X .-> Y)
 Canonical Structure compose_ptd.
 (* Doesn't seem to work, e.g. in [is_exact] below.  TODO (low): investigate? 
 TODO (mid): in meantime, make notation [f .o g] for this?*)
+
+End Pointed_Maps.
+
+
+(*******************************************************************************
+
+Some examples of pointed types.
+
+*******************************************************************************)
+
+Section Pointed_Types_Examples.
+
+Definition Unit_Ptd : pointed_type
+  := mk_pointed_type Unit tt.
+
+Canonical Structure Unit_Ptd.
+
+Definition hfiber_ptd {X Y : pointed_type} (f : X .-> Y) : pointed_type
+:= mk_pointed_type (hfiber f point) (point; pt_map_pt f).
+
+(* TODO (mid): fix once issues (?what issues?) are cleared up. *)
+Canonical Structure hfiber_ptd.
+
+Definition hfiber_incl_ptd {X Y : pointed_type} (f : X .-> Y)
+  : (hfiber_ptd f) .-> X
+:= @mk_pointed_map (hfiber_ptd f) X (hfiber_incl f point) 1.
+
+Definition hfiber_null {X Y : pointed_type} (f : X .-> Y)
+  : compose_ptd f (hfiber_incl_ptd f) .== point.
+Proof.
+  exists (fun xp => pr2 xp); simpl.
+  apply inverse. exact (concat_p1 _ @ concat_1p _).
+Defined.
 
 (* If [Z -g-> Y -f-> X] are pointed maps, a (pointed) nullhomotopy of the
 composite induces a factorisation of [Z] through the fiber of [f].  *)
@@ -137,8 +145,7 @@ Definition is_exact {Z Y X} (g : Z .-> Y) (f : Y .-> X)
 Consider the sequence [Int -> 1 -> S1]: with the nullhomotopy
 [fun n => loop ^n], it is exact, but with [fun _ => refl], it is not. *)
 
-End Pointed_Maps.
-
+End Pointed_Types_Examples.
 
 (*******************************************************************************
 
