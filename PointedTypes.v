@@ -171,17 +171,25 @@ Definition Omega_ptd (A:pointed_type) : pointed_type
 := {| pt_type := Omega A point;
       point := idpath point |}.
 
-(* TODO (mid): fix once this issue (?what issue?) is cleared up. *)
-(* Canonical Structure Omega_Ptd. *)
+(* Doesn't seem to work, eg in [Omega_ptd_fmap] below.  TODO: figure out issue? *)
+Canonical Structure Omega_ptd.
 
 Definition Omega_ptd_fmap {A B : pointed_type} (f : A .-> B)
 : (Omega_ptd A) .-> (Omega_ptd B).
 Proof.
-  exists (fun p : Omega_ptd A => (pt_map_pt f)^ @ ap f p @ pt_map_pt f).
+  exists (Omega_conj (pt_map_pt f) o Omega_fmap point f).
+  unfold Omega_conj, compose, concatR; simpl.
   path_via ((pt_map_pt f)^ @ pt_map_pt f).
   apply whiskerR, concat_p1.
   apply concat_Vp.
 Defined.
+
+Instance isequiv_Omega_ptd_fmap {A B : pointed_type} (f : A .-> B)
+  : IsEquiv f -> IsEquiv (Omega_ptd_fmap f).
+Proof.
+  intros f_iseq. apply isequiv_compose.
+  (* [isequiv_Omega_conj] and [isequiv_Omega_fmap] found automagically *)
+Defined.  
 
 Fixpoint Omega_ptd_fmap_iterate {A B : pointed_type} (f : A .-> B) (n : nat)
   : (iterate Omega_ptd n A) .-> (iterate Omega_ptd n B)

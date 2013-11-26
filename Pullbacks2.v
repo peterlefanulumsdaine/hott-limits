@@ -94,6 +94,25 @@ Proof.
   exact (ap f).
 Defined.
 
+Instance isequiv_Omega_fmap {A B : Type} (a0 : A) (f : A->B)
+: IsEquiv f -> IsEquiv (Omega_fmap a0 f).
+Proof.
+  intros f_iseq. apply isequiv_ap; assumption.
+Qed.
+
+Definition Omega_conj {A} {a0 a1:A} (p:a0 = a1)
+: Omega A a0 -> Omega A a1.
+Proof.
+  exact ((concatR p) o (concat p^)).
+Defined.
+
+Instance isequiv_Omega_conj {A} {a0 a1:A} (p:a0 = a1)
+: IsEquiv (Omega_conj p).
+Proof.
+  apply isequiv_compose.
+  (* [isequiv_concat], [isequiv_concatR] found automatically! *)
+Qed.
+
 End Loops.
 
 
