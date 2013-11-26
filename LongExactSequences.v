@@ -109,7 +109,7 @@ We first construct the long exact sequence of a pointed map simply by iteratedly
 taking its fiber.  Constructed this way, it is evidently exact.  We then show,
 afterwards, that it is equivalent to a sequence of loop spaces.
 
-(TODO: do this last part.)
+(TODO: complete this last part.)
 
 *******************************************************************************)
 
@@ -133,7 +133,7 @@ Definition hfiber_sequence {A B} (f : B .-> A) : long_sequence
 Lemma is_exact_hfiber_sequence {A B} (f : B .-> A)
   : lseq_is_exact (hfiber_sequence f).
 Proof.
-  intro; apply (is_exact_hfiber_incl _).
+  intro; apply (is_exact_hfiber _).
 Qed.
 
 End Hfiber_Sequence.
@@ -150,9 +150,42 @@ Long exact sequence.
                                 y -> Y -> Z
 *******************************************************************************)
 
-(* TODO (high): make this a pointed equivalence!  Possibly also rewrite this
-to make the underlying map explicit. *)
-Lemma long_exact_lemma
+Lemma hfiber_to_Omega {X Y : pointed_type} (f:Y.->X)
+: (hfiber_ptd (hfiber_incl_ptd f)) .-> Omega_ptd X.
+Proof.
+  apply @composeR_ptd with (pullback_ptd (hfiber_incl_ptd f) name_point).
+    apply hfiber_to_pullback_ptd.
+  apply @composeR_ptd with (pullback_ptd (pullback_ptd_pr1 f name_point) name_point).
+    admit. (* pointed invariance of pullback under equivalence *)
+  apply @composeR_ptd with (pullback_ptd (pullback_ptd_pr2 name_point f) name_point).
+    admit. (* pointed symmetry of pullback *)
+  apply @composeR_ptd with (pullback_ptd name_point (compose_ptd f name_point)).
+    apply (@equiv_inverse_ptd _ _ (outer_to_double_pullback_ptd _ _ _)).
+    apply two_pullbacks_isequiv.
+  apply @composeR_ptd with (pullback_ptd (@name_point X) name_point).
+    admit. (* pointed invariance of pullback under homotopy *)
+  apply equiv_inverse_ptd with (Omega_to_pullback_ptd X).
+    apply isequiv_Omega_to_pullback.
+Defined.
+
+Lemma isequiv_hfiber_to_Omega {X Y : pointed_type} (f:Y.->X)
+: IsEquiv (hfiber_to_Omega f).
+Proof.
+  apply @isequiv_compose.
+    apply isequiv_hfiber_to_pullback.
+  apply @isequiv_compose.
+    admit.
+  apply @isequiv_compose.
+    admit.
+  apply @isequiv_compose.
+    apply isequiv_inverse.
+  apply @isequiv_compose.
+    admit.
+  apply isequiv_inverse.
+Qed.
+
+(* TODO: remove after cannibalising. *)
+Lemma long_exact_lemma_old
 : forall {X Y : pointed_type} (f:Y.->X),
     (pt_type (hfiber_ptd (hfiber_incl_ptd f)))
     <~> Omega_ptd X.
@@ -160,9 +193,9 @@ Proof.
   intros. simpl.
   set (y := @point Y). set (x := @point X).
   equiv_via (pullback (name x) (name x)). Focus 2.
-    apply equiv_inverse. apply loop_is_pullback.
+    apply equiv_inverse. apply Omega_to_pullback_equiv.
   equiv_via (pullback (hfiber_incl f x) (name y)).
-    apply hfiber_as_pullback_equiv.
+    apply hfiber_to_pullback_equiv.
   equiv_via (pullback (name x) (f o name y)). Focus 2.
     assert (f o name y = name x) as name_path.
       apply path_forall. intros [ ]. apply pt_map_pt.
@@ -170,9 +203,9 @@ Proof.
   equiv_via (pullback (f^* (name x)) (name y)). Focus 2.
     apply equiv_inverse. apply two_pullbacks_equiv.
   equiv_via (pullback
-    (hfiber_incl f x o equiv_inv (hfiber_as_pullback_equiv f x)) (name y)).
+    (hfiber_incl f x o equiv_inv (hfiber_to_pullback_equiv f x)) (name y)).
     apply pullback_resp_equiv_A.
-  assert ( hfiber_incl f x o (hfiber_as_pullback_equiv f x) ^-1
+  assert ( hfiber_incl f x o (hfiber_to_pullback_equiv f x) ^-1
            = @pullback_pr1 _ _ _ f (name x)) as pr1_path.
     apply path_forall. intros [y' [[] p]]. unfold name in p. simpl.
     unfold compose. simpl. exact 1.
@@ -186,11 +219,6 @@ Proof.
   apply pullback_resp_equiv_A.
 Defined.
 
-(* TODO (high): move; and check naming convention *)
-Definition Omega_ptd_fmap_isequiv {A B : pointed_type} (f : A .-> B) (f_iseq : IsEquiv f)
-: IsEquiv (Omega_ptd_fmap f).
-Admitted.
-
 Lemma long_exact_sequence_aux1 {X Y} (f : Y .-> X) (n:nat)
   : hfiber_sequence f (n*3) .-> (iterate Omega_ptd n) X.
 Proof.
@@ -198,19 +226,19 @@ Proof.
   (* n=0 *) apply idmap_ptd.
   (* n=S n' *)
   apply @compose_ptd with (Y := Omega_ptd (hfiber_sequence f (n'*3))).
-  apply Omega_ptd_fmap, IH.
-  admit. (* TODO: split up [long_exact_lemma] to a pointed map and an IsEquiv. *)
+    apply Omega_ptd_fmap, IH.
+  apply hfiber_to_Omega.
 Defined.
 
 Lemma long_exact_sequence_aux2 {X Y} (f : Y .-> X) (n:nat)
   : IsEquiv (long_exact_sequence_aux1 f n).
 Proof.
-  induction n as [ | n' IH]; simpl.  
-  (* n=0 *) apply isequiv_idmap.
+  induction n as [ | n' IH].  
+  (* n=0 *) simpl; apply isequiv_idmap.
   (* n=S n' *)
   apply @isequiv_compose with (B := Omega_ptd (hfiber_sequence f (n'*3))).
-  admit.  (* TODO: use second part of split-up LES lemma here *)
-  apply Omega_ptd_fmap_isequiv, IH.
+    apply isequiv_hfiber_to_Omega.
+  apply isequiv_Omega_ptd_fmap, IH.
 Qed.
 
 (* TODO: also show how this interacts with the functoriality of Omega. *)
