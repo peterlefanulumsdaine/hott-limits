@@ -139,6 +139,10 @@ Proof.
   apply inverse. exact (concat_p1 _ @ concat_1p _).
 Defined.
 
+End Pointed_Types_Examples.
+
+Section Pointed_Pullbacks.
+
 Definition pullback_ptd {A B C} (f : A .-> C) (g : B .-> C) : pointed_type
 := mk_pointed_type (pullback f g)
   (point; (point; (pt_map_pt f @ (pt_map_pt g)^))).
@@ -164,7 +168,73 @@ Proof.
   apply pullback_path'. exists 1; exists 1.
   unfold pullback_comm; simpl. apply whiskerR, concat_1p.
 Defined.
-  
+
+Record ptd_cospan_map
+  {A B C} (f : A .-> C) (g : B .-> C)
+  {A' B' C'} (f' : A' .-> C') (g' : B' .-> C')
+:= mk_ptd_cospan_map
+  { ptd_cospan_map_A : A .-> A';
+    ptd_cospan_map_B : B .-> B';
+    ptd_cospan_map_C : C .-> C';
+    ptd_cospan_map_f : compose_ptd f' ptd_cospan_map_A .== compose_ptd ptd_cospan_map_C f;
+    ptd_cospan_map_g : compose_ptd g' ptd_cospan_map_B .== compose_ptd ptd_cospan_map_C g }.
+
+Global Arguments ptd_cospan_map_A [A B C f g A' B' C' f' g'] k : rename.
+Global Arguments ptd_cospan_map_B [A B C f g A' B' C' f' g'] k : rename.
+Global Arguments ptd_cospan_map_C [A B C f g A' B' C' f' g'] k : rename.
+Global Arguments ptd_cospan_map_f [A B C f g A' B' C' f' g'] k : rename.
+Global Arguments ptd_cospan_map_g [A B C f g A' B' C' f' g'] k : rename.
+Global Arguments mk_ptd_cospan_map [A B C f g A' B' C' f' g'] kA ckB kC kf kg :
+  rename.
+
+Definition cospan_map_of_ptd_cospan_map
+  {A B C} {f : A .-> C} {g : B .-> C}
+  {A' B' C'} {f' : A' .-> C'} {g' : B' .-> C'}
+  : ptd_cospan_map f g f' g' -> cospan_map f g f' g'
+:= (fun M => mk_cospan_map
+    (ptd_cospan_map_A M)
+    (ptd_cospan_map_B M)
+    (ptd_cospan_map_C M)
+    (ptd_cospan_map_f M)
+    (ptd_cospan_map_g M)).
+
+Coercion cospan_map_of_ptd_cospan_map : ptd_cospan_map >-> cospan_map.
+
+(*TODO (low): this seems unnecessarily painful!  Simplify??*)
+Lemma pullback_ptd_fmap
+  {A B C} {f : A .-> C} {g : B .-> C}
+  {A' B' C'} {f' : A' .-> C'} {g' : B' .-> C'}
+: ptd_cospan_map f g f' g'
+  -> (pullback_ptd f g .-> pullback_ptd f' g').
+Proof.
+  intros M.
+  exists (pullback_fmap M).
+  apply pullback_path'; simpl.
+    exists (pt_map_pt _).
+    exists (pt_map_pt _).
+  unfold pullback_comm; simpl. unfold pullback_pr2, pullback_comm; simpl.
+  set (MA := ptd_cospan_map_A M).
+  set (MB := ptd_cospan_map_B M).
+  set (MC := ptd_cospan_map_C M).
+  set (Mf := ptd_cospan_map_f M).
+  set (Mg := ptd_cospan_map_g M).
+(* Modulo algebra, the essential content of the prood from here on is just
+[pt_htpy_pt Mf] and [pt_htpy_pt Mg]. *)
+  apply moveR_pM, moveR_Vp.
+  apply (concat (whiskerR (pt_htpy_pt Mf) _)). simpl; fold Mf MA MC.
+  apply (concat concat_pp_p), (concat concat_pp_p), whiskerL.
+  apply (concatR concat_p_pp), whiskerL. apply moveR_Vp.
+  apply (concat (whiskerR (ap_pp MC _ _) _)).
+  apply (concat concat_pp_p), (concatR concat_p_pp), whiskerL.
+  apply moveR_pV, moveL_Mp, inverse.
+  apply (concat (pt_htpy_pt Mg)). simpl; fold MB MC Mg.
+  apply (concat (whiskerL _ (inv_pp _ _))).
+  apply (concat concat_p_pp).
+  apply inverse, concat2. Focus 2. apply ap_V.
+  apply (concat (inv_pp _ _)). apply whiskerR.
+  apply (concat (inv_pp _ _)). apply concat2; apply inv_V.
+Defined.
+
 (*TODO (low): this seems unnecessarily painful!  Simplify??*)
 Definition outer_to_double_pullback_ptd {A B1 B2 C}
   (f : A .-> C) (g : B1 .-> C) (h : B2 .-> B1)
@@ -193,7 +263,7 @@ Proof.
    refine (concat_p1 _ @ concat_p1 _).
 Defined.
 
-End Pointed_Types_Examples.
+End Pointed_Pullbacks.
 
 (*******************************************************************************
 
