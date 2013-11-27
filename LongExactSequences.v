@@ -163,7 +163,12 @@ Proof.
       apply (concat_ptd_htpy (compose_f1_ptd _)).
       apply inverse_ptd_htpy, compose_1f_ptd.
   apply @composeR_ptd with (pullback_ptd (pullback_ptd_pr2 name_point f) name_point).
-    admit. (* pointed symmetry of pullback *)
+    apply pullback_ptd_fmap.
+    apply mk_ptd_cospan_map with (pullback_ptd_symm _ _) (idmap_ptd _) (idmap_ptd _). 
+      apply (concat_ptd_htpy (pullback_ptd_symm_pr2 _ _)).
+        apply inverse_ptd_htpy, compose_1f_ptd.
+      apply (concat_ptd_htpy (compose_f1_ptd _)).
+      apply inverse_ptd_htpy, compose_1f_ptd.
   apply @composeR_ptd with (pullback_ptd name_point (compose_ptd f name_point)).
     apply (@equiv_inverse_ptd _ _ (outer_to_double_pullback_ptd _ _ _)).
     apply two_pullbacks_isequiv.
@@ -191,14 +196,16 @@ gets quite large as it unfolds. *)
       apply isequiv_idmap.
       apply isequiv_idmap.
   apply @isequiv_compose'.
-    admit.
+    apply (pullback_fmap_isequiv _ name_point _ name_point).
+      apply pullback_symm_isequiv.
+      apply isequiv_idmap.
+      apply isequiv_idmap.
   apply @isequiv_compose'.
     apply isequiv_inverse.
   apply @isequiv_compose'.
     admit.
   apply isequiv_inverse.
 Qed.
-
 
 (* TODO: remove after cannibalising. *)
 Lemma long_exact_lemma_old

@@ -211,12 +211,13 @@ Proof.
   exists ((fun y => 1)
     : ((pullback_ptd_pr1 f name_point) o (hfiber_to_pullback_ptd f)
       == hfiber_incl_ptd f)).
-  simpl; unfold pullback_comm; simpl.
-  apply inverse, (concat (concat_p1 _ @ concat_p1 _)).
-  apply (concat (ap_compose
-    (exist (fun x : Y => {y : Unit & f x = name point y}) point)
-    (@pullback_pr1 Y Unit X f (@name X (@point X))) _)^).
-  unfold compose; simpl. apply ap_const.
+  apply inverse, moveR_pV.
+  change (1 @ pt_map_pt (hfiber_incl_ptd f)) with (@idpath _ (@point Y)).
+  apply (concat (concat_p1 _)).
+  simpl.
+  exact (pullback_path'_pr1
+    (hfiber_to_pullback f point (point; pt_map_pt f))
+    (point; (tt; pt_map_pt f @ 1)) _).
 Defined.
 
 Record ptd_cospan_map
@@ -311,6 +312,40 @@ Proof.
    unfold pullback_comm; simpl.
    apply (concatR (concat_1p _)^).
    refine (concat_p1 _ @ concat_p1 _).
+Defined.
+
+Definition pullback_ptd_symm {A B C} (f : A .-> C) (g : B .-> C)
+  : pullback_ptd f g .-> pullback_ptd g f.
+Proof.
+  exists (pullback_symm f g).
+  apply pullback_path'.
+  unfold pullback_symm; unfold pullback_pr2, pullback_comm; simpl.
+  exists 1. exists 1. simpl.
+  refine (concat_p1 _ @ concat_1p _ @ _). apply inv_pV.
+Defined.
+
+Definition pullback_ptd_symm_pr1 {A B C} (f : A .-> C) (g : B .-> C)
+  : compose_ptd (pullback_ptd_pr1 g f) (pullback_ptd_symm f g)
+    .== (pullback_ptd_pr2 f g).
+Proof.
+  exists ((fun p => 1)
+    : pullback_pr1 o (pullback_symm f g) == pullback_pr2).
+  apply inverse, moveR_pV.
+  change (1 @ pt_map_pt (pullback_ptd_pr2 f g)) with (@idpath _ (@point B)).
+  apply (concat (concat_p1 _)); simpl.
+  apply (pullback_path'_pr1 (pullback_symm f g point) point).
+Defined.
+
+Definition pullback_ptd_symm_pr2 {A B C} (f : A .-> C) (g : B .-> C)
+  : compose_ptd (pullback_ptd_pr2 g f) (pullback_ptd_symm f g)
+    .== (pullback_ptd_pr1 f g).
+Proof.
+  exists ((fun p => 1)
+    : pullback_pr2 o (pullback_symm f g) == pullback_pr1).
+  apply inverse, moveR_pV.
+  change (1 @ pt_map_pt (pullback_ptd_pr1 f g)) with (@idpath _ (@point A)).
+  apply (concat (concat_p1 _)); simpl.
+  apply (pullback_path'_pr2 (pullback_symm f g point) point).
 Defined.
 
 End Pointed_Pullbacks.
