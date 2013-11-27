@@ -91,6 +91,41 @@ to Coq's special treatment of the period. *)
 Definition composeR_ptd {X Y Z} (g : X .-> Y) (f : Y .-> Z)
 := compose_ptd f g.
 
+Definition compose_1f_ptd {X Y} (f : X .-> Y)
+  : compose_ptd (idmap_ptd _) f .== f.
+Proof.
+  destruct f as [f fp].
+  exists ((fun x => 1) : (idmap o f) == f).
+  simpl. apply moveL_pV.
+  exact (concat_1p _ @ (ap_idmap _)^ @ (concat_p1 _)^). 
+Defined.
+
+Definition compose_f1_ptd {X Y} (f : X .-> Y)
+  : compose_ptd f (idmap_ptd _) .== f.
+Proof.
+  destruct f as [f fp].
+  exists ((fun x => 1) : (f o idmap) == f). 
+  simpl. apply moveL_pV. exact 1.
+Defined.
+
+Definition concat_ptd_htpy {X Y} {f g h : X.-> Y}
+  : (f .== g) -> (g .== h) -> (f .== h).
+Proof.
+  intros H J.
+  exists (fun x => pt_htpy H x @ pt_htpy J x).
+  apply (concat (concat2 (pt_htpy_pt H) (pt_htpy_pt J))).
+  apply (concat concat_pp_p), whiskerL.
+  apply concat_V_pp.
+Defined.
+
+Definition inverse_ptd_htpy {X Y} {f g : X.-> Y}
+  : (f .== g) -> (g .== f).
+Proof.
+  intros H.
+  exists (fun x => (pt_htpy H x)^).
+  apply (concat (ap inverse (pt_htpy_pt H))). apply inv_pV.
+Defined.
+
 (* Useful fact: the inverse of a pointed equivalence is also pointed. *)
 Definition equiv_inverse_ptd {A B} (f : A .-> B) {f_iseq : IsEquiv f}
   : B .-> A.
@@ -167,6 +202,21 @@ Proof.
   exists (hfiber_to_pullback f point).
   apply pullback_path'. exists 1; exists 1.
   unfold pullback_comm; simpl. apply whiskerR, concat_1p.
+Defined.
+
+Lemma hfiber_to_pullback_ptd_factn {X Y : pointed_type} (f:Y.->X)
+  : compose_ptd (pullback_ptd_pr1 f name_point) (hfiber_to_pullback_ptd f)
+  .== compose_ptd (idmap_ptd Y) (hfiber_incl_ptd f).
+Proof.
+  exists ((fun y => 1)
+    : ((pullback_ptd_pr1 f name_point) o (hfiber_to_pullback_ptd f)
+      == hfiber_incl_ptd f)).
+  simpl; unfold pullback_comm; simpl.
+  apply inverse, (concat (concat_p1 _ @ concat_p1 _)).
+  apply (concat (ap_compose
+    (exist (fun x : Y => {y : Unit & f x = name point y}) point)
+    (@pullback_pr1 Y Unit X f (@name X (@point X))) _)^).
+  unfold compose; simpl. apply ap_const.
 Defined.
 
 Record ptd_cospan_map

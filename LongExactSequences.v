@@ -17,6 +17,7 @@ Require Import Auxiliary Arith Fundamentals Pullbacks Pullbacks2 PointedTypes.
 
 Open Scope path_scope.
 
+
 (******************************************************************************
 
 Some small lemmas, required for the theorems of this section but not quite
@@ -156,7 +157,11 @@ Proof.
   apply @composeR_ptd with (pullback_ptd (hfiber_incl_ptd f) name_point).
     apply hfiber_to_pullback_ptd.
   apply @composeR_ptd with (pullback_ptd (pullback_ptd_pr1 f name_point) name_point).
-    admit. (* pointed invariance of pullback under equivalence *)
+    apply pullback_ptd_fmap.
+    apply mk_ptd_cospan_map with (hfiber_to_pullback_ptd _) (idmap_ptd _) (idmap_ptd _). 
+      apply hfiber_to_pullback_ptd_factn.
+      apply (concat_ptd_htpy (compose_f1_ptd _)).
+      apply inverse_ptd_htpy, compose_1f_ptd.
   apply @composeR_ptd with (pullback_ptd (pullback_ptd_pr2 name_point f) name_point).
     admit. (* pointed symmetry of pullback *)
   apply @composeR_ptd with (pullback_ptd name_point (compose_ptd f name_point)).
@@ -171,15 +176,25 @@ Defined.
 Lemma isequiv_hfiber_to_Omega {X Y : pointed_type} (f:Y.->X)
 : IsEquiv (hfiber_to_Omega f).
 Proof.
-  apply @isequiv_compose.
+  assert (isequiv_compose' : forall {A B C} (g:A.->B) (h:B.->C),
+              IsEquiv g -> IsEquiv h -> IsEquiv (composeR_ptd g h)).
+    intros; apply isequiv_compose.
+(* Why define [isequiv_compose']?  It works slightly faster in the
+following steps, since Coq doesn't need to unfold [compose_ptd] to unify
+when using it; and the saving is significant since [hfiber_to_Omega f]
+gets quite large as it unfolds. *)
+  apply @isequiv_compose'.
     apply isequiv_hfiber_to_pullback.
-  apply @isequiv_compose.
+  apply @isequiv_compose'.
+    apply (pullback_fmap_isequiv _ name_point _ name_point).
+      apply isequiv_hfiber_to_pullback.
+      apply isequiv_idmap.
+      apply isequiv_idmap.
+  apply @isequiv_compose'.
     admit.
-  apply @isequiv_compose.
-    admit.
-  apply @isequiv_compose.
+  apply @isequiv_compose'.
     apply isequiv_inverse.
-  apply @isequiv_compose.
+  apply @isequiv_compose'.
     admit.
   apply isequiv_inverse.
 Qed.
