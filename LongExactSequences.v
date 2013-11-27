@@ -17,34 +17,6 @@ Require Import Auxiliary Arith Fundamentals Pullbacks Pullbacks2 PointedTypes.
 
 Open Scope path_scope.
 
-
-(******************************************************************************
-
-Some small lemmas, required for the theorems of this section but not quite
-fitting anywhere else.
-
-*******************************************************************************)
-
-Section Varia.
-
-(* Compare [equiv_sigma_contr] in library. *)
-Lemma isequiv_sigma_contr {X:Type} {Y:X->Type}
-: (forall x:X, Contr (Y x)) -> IsEquiv (@projT1 X Y).
-Proof.
-  intros H. exact (equiv_isequiv (equiv_sigma_contr _)).
-Defined.
-
-Lemma isequiv_hfiber_incl_over_hprop {Y X : Type} (X_hprop : IsHProp X)
-  (f : Y -> X) (x:X)
-: IsEquiv (hfiber_incl f x).
-Proof.
-  apply isequiv_sigma_contr.
-  intros y. apply X_hprop.
-Defined.
-
-End Varia.
-
-
 (*******************************************************************************
 
 General long sequences
