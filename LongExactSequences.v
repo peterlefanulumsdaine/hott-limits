@@ -173,7 +173,14 @@ Proof.
     apply (@equiv_inverse_ptd _ _ (outer_to_double_pullback_ptd _ _ _)).
     apply two_pullbacks_isequiv.
   apply @composeR_ptd with (pullback_ptd (@name_point X) name_point).
-    admit. (* pointed invariance of pullback under homotopy *)
+    apply pullback_ptd_fmap.
+    apply mk_ptd_cospan_map with (idmap_ptd _) (idmap_ptd _) (idmap_ptd _).
+      apply (concat_ptd_htpy (compose_f1_ptd _)).
+      apply inverse_ptd_htpy, compose_1f_ptd.
+      apply (concat_ptd_htpy (compose_f1_ptd _)).
+      apply inverse_ptd_htpy, (concat_ptd_htpy (compose_1f_ptd _)).
+      exists (fun _ => pt_map_pt f).     
+      simpl. exact ((concat_p1 _ @ concat_1p _)^).
   apply equiv_inverse_ptd with (Omega_to_pullback_ptd X).
     apply isequiv_Omega_to_pullback.
 Defined.
@@ -203,45 +210,14 @@ gets quite large as it unfolds. *)
   apply @isequiv_compose'.
     apply isequiv_inverse.
   apply @isequiv_compose'.
-    admit.
+    apply (pullback_fmap_isequiv name_point (f o name_point)
+                                 name_point name_point);
+    apply isequiv_idmap.
   apply isequiv_inverse.
 Qed.
 
-(* TODO: remove after cannibalising. *)
-Lemma long_exact_lemma_old
-: forall {X Y : pointed_type} (f:Y.->X),
-    (pt_type (hfiber_ptd (hfiber_incl_ptd f)))
-    <~> Omega_ptd X.
-Proof.
-  intros. simpl.
-  set (y := @point Y). set (x := @point X).
-  equiv_via (pullback (name x) (name x)). Focus 2.
-    apply equiv_inverse. apply Omega_to_pullback_equiv.
-  equiv_via (pullback (hfiber_incl f x) (name y)).
-    apply hfiber_to_pullback_equiv.
-  equiv_via (pullback (name x) (f o name y)). Focus 2.
-    assert (f o name y = name x) as name_path.
-      apply path_forall. intros [ ]. apply pt_map_pt.
-    rewrite name_path. apply equiv_idmap.
-  equiv_via (pullback (f^* (name x)) (name y)). Focus 2.
-    apply equiv_inverse. apply two_pullbacks_equiv.
-  equiv_via (pullback
-    (hfiber_incl f x o equiv_inv (hfiber_to_pullback_equiv f x)) (name y)).
-    apply pullback_resp_equiv_A.
-  assert ( hfiber_incl f x o (hfiber_to_pullback_equiv f x) ^-1
-           = @pullback_pr1 _ _ _ f (name x)) as pr1_path.
-    apply path_forall. intros [y' [[] p]]. unfold name in p. simpl.
-    unfold compose. simpl. exact 1.
-  rewrite pr1_path.
-  assert ((@pullback_pr1 _ _ _ f (name x)
-          o (pullback_symm_equiv f (name x)) ^-1)
-          = f^* (name x)) as symm_path.
-    apply path_forall. intros [[] [y' p]].
-    unfold compose, pullback_pr2; simpl. exact 1.
-  rewrite <- symm_path.
-  apply pullback_resp_equiv_A.
-Defined.
-
+(* Note that this must be defined as a *pointed* map, since pointedness is
+required for the functoriality of Omega, and hence for the induction step. *)
 Lemma long_exact_sequence_aux1 {X Y} (f : Y .-> X) (n:nat)
   : hfiber_sequence f (n*3) .-> (iterate Omega_ptd n) X.
 Proof.

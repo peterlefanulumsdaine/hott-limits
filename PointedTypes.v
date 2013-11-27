@@ -118,6 +118,10 @@ Proof.
   apply concat_V_pp.
 Defined.
 
+Definition concatR_ptd_htpy {X Y} {f g h : X.-> Y}
+  : (g .== h) -> (f .== g) -> (f .== h)
+:= (fun H J => concat_ptd_htpy J H).
+
 Definition inverse_ptd_htpy {X Y} {f g : X.-> Y}
   : (f .== g) -> (g .== f).
 Proof.
