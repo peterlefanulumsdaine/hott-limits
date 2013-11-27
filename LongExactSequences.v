@@ -27,20 +27,18 @@ fitting anywhere else.
 
 Section Varia.
 
-Lemma sigma_of_contractibles_isequiv {X:Type} {Y:X->Type}
+(* Compare [equiv_sigma_contr] in library. *)
+Lemma isequiv_sigma_contr {X:Type} {Y:X->Type}
 : (forall x:X, Contr (Y x)) -> IsEquiv (@projT1 X Y).
 Proof.
-  intros H. apply isequiv_fcontr. intros x.
-  apply @contr_equiv' with (Y x).
-  apply fiber_to_hfiber_equiv.
-  apply H.
+  intros H. exact (equiv_isequiv (equiv_sigma_contr _)).
 Defined.
 
-Lemma hfiber_over_hprop {Y X : Type} (X_hprop : IsHProp X)
+Lemma isequiv_hfiber_incl_over_hprop {Y X : Type} (X_hprop : IsHProp X)
   (f : Y -> X) (x:X)
 : IsEquiv (hfiber_incl f x).
 Proof.
-  apply sigma_of_contractibles_isequiv.
+  apply isequiv_sigma_contr.
   intros y. apply X_hprop.
 Defined.
 
@@ -53,17 +51,17 @@ General long sequences
 
 *******************************************************************************)
 
-Section Sequences.
+Section Long_Sequences.
 
 Record long_sequence := {
-  seq_obs :> nat -> pointed_type;
-  seq_maps : forall n:nat, seq_obs (1+n) .-> seq_obs n;
-  seq_null : forall n:nat, compose_ptd (seq_maps n) (seq_maps (1+n)) .== point }.
+  lseq_obs :> nat -> pointed_type;
+  lseq_maps : forall n:nat, lseq_obs (1+n) .-> lseq_obs n;
+  lseq_null : forall n:nat, compose_ptd (lseq_maps n) (lseq_maps (1+n)) .== point }.
 
 Definition lseq_is_exact (X : long_sequence)
-  := forall n, is_exact (seq_maps X (1+n)) (seq_maps X n) (seq_null X n).
+  := forall n, is_exact (lseq_maps X (1+n)) (lseq_maps X n) (lseq_null X n).
 
-End Sequences.
+End Long_Sequences.
 
 (* Long sequences are often constructed inductively.  This is just a little
 delicate, due to the dependency between the types of the components.
@@ -73,15 +71,20 @@ Here we give a typical example construction; this serves as a template for
 course be generalised to a precise theorem, but for the present applications,
 that would be more trouble than it's worth. *)
 
-Section Sequence_Template.  
+Section Long_Sequence_Template.  
 
 Hypothesis A0 : pointed_type.
-Hypothesis template_iterator_dom : forall A B (f : B .-> A), pointed_type.
+Hypothesis template_iterator_dom : forall A B (f : B .-> A),
+  pointed_type.
 Arguments template_iterator_dom [A B] f.
-Hypothesis template_iterator_map : forall A B (f : B .-> A), (template_iterator_dom f) .-> B.
+Hypothesis template_iterator_map : forall A B (f : B .-> A),
+  (template_iterator_dom f) .-> B.
 Arguments template_iterator_map [A B] f.
+Hypothesis template_iterator_null : forall A B (f : B .-> A),
+  compose_ptd f (template_iterator_map f) .== point.
+Arguments template_iterator_null [A B] f.
 
-Definition template_aux (n:nat) : { A:pointed_type & {B : pointed_type & B .-> A}}.
+Definition lseq_template_aux (n:nat) : { A:pointed_type & {B : pointed_type & B .-> A}}.
 Proof.
   induction n as [ | n' ABf].
   (* n=0 *) exists A0; exists A0; apply idmap_ptd.
@@ -90,27 +93,23 @@ Proof.
   exists B. exists (template_iterator_dom f). exact (template_iterator_map f).
 Defined.
 
-Definition template_obs (n:nat) : pointed_type
-  := pr1 (template_aux n).
+Definition lseq_template (n:nat) : long_sequence
+  := {| lseq_obs n := pr1 (lseq_template_aux n);
+        lseq_maps n := pr2 (pr2 (lseq_template_aux n));
+        lseq_null n := template_iterator_null
+                        (pr2 (pr2 (lseq_template_aux n))) |}.
 
-Definition template_map (n:nat) : template_obs (1+n) .-> template_obs n.
-Proof.
-  unfold template_obs; simpl.
-  exact (pr2 (pr2 (template_aux n))).
-Defined.
-
-End Sequence_Template.
+End Long_Sequence_Template.
 
 
 (*******************************************************************************
 
-The fiber sequence of a pointed map
+The fiber sequence of a pointed map.
 
 We first construct the long exact sequence of a pointed map simply by iteratedly
 taking its fiber.  Constructed this way, it is evidently exact.  We then show,
-afterwards, that it is equivalent to a sequence of loop spaces.
-
-(TODO: complete this last part.)
+in [Omega_to_hfiber_seq_0] et seq., that it is equivalent to a sequence of loop
+spaces.
 
 *******************************************************************************)
 
@@ -126,10 +125,12 @@ Proof.
   exists B. exists (hfiber_ptd f). apply hfiber_incl_ptd.
 Defined.
 
+Arguments hfiber_sequence_aux [A B] f n : rename, simpl nomatch.
+
 Definition hfiber_sequence {A B} (f : B .-> A) : long_sequence
-:= {| seq_obs n := pr1 (hfiber_sequence_aux f n);
-      seq_maps n := pr2 (pr2 (hfiber_sequence_aux f n));
-      seq_null n := hfiber_null _ |}.
+:= {| lseq_obs n := pr1 (hfiber_sequence_aux f n);
+      lseq_maps n := pr2 (pr2 (hfiber_sequence_aux f n));
+      lseq_null n := hfiber_null _ |}.
 
 Lemma is_exact_hfiber_sequence {A B} (f : B .-> A)
   : lseq_is_exact (hfiber_sequence f).
@@ -137,18 +138,46 @@ Proof.
   intro; apply (is_exact_hfiber _).
 Qed.
 
+Lemma hfiber_sequence_shift_aux {A B} (f : B .-> A) (n:nat)
+  : hfiber_sequence_aux f (1+n)
+  = hfiber_sequence_aux (hfiber_incl_ptd f) n.
+Proof.
+  induction n as [ | n' IH].
+  (* n = 0 *) simpl; exact 1.
+  (* n = 1+n' *) exact (ap (fun ABf =>
+    (pr1 (pr2 ABf); (hfiber_ptd (pr2 (pr2 ABf));
+      hfiber_incl_ptd (pr2 (pr2 ABf))))) IH).
+Defined.
+
+Lemma hfiber_sequence_shift {A B} (f : B .-> A) (n:nat)
+  : hfiber_sequence f (1+n) = hfiber_sequence (hfiber_incl_ptd f) n.
+Proof.
+  simpl. 
+  change (pr1 (pr2 (hfiber_sequence_aux f n)))
+  with (pr1 (hfiber_sequence_aux f (1+n))).
+  apply ap, hfiber_sequence_shift_aux.
+Defined.
+
 End Hfiber_Sequence.
 
 (******************************************************************************
-Long exact sequence.
 
-                                     x
-                                     |
-                                     V
-                                W -> X -> z
+The long exact sequence of loop spaces.
+
+                                W -> Z -> 1
                                 |    |    |
                                 V    V    V
-                                y -> Y -> Z
+                                1 -> Y -> X
+
+We show that the objects of the hfiber sequence of a map are equivalent to
+iterated loop spaces.  The key lemma is showing that the double fiber of a
+pointed map [f : Y .-> X] is pointed-equivalent to the loop space [Omega_ptd X].
+
+We do *not* currently show the stronger statement that the *maps* of the hfiber
+sequence agree (under the above equivalences) with the action on iterated loop
+spaces of [f], and hence that the whole sequence is equivalent to one built
+from loop spaces.
+
 *******************************************************************************)
 
 Lemma hfiber_to_Omega {X Y : pointed_type} (f:Y.->X)
@@ -188,28 +217,21 @@ Defined.
 Lemma isequiv_hfiber_to_Omega {X Y : pointed_type} (f:Y.->X)
 : IsEquiv (hfiber_to_Omega f).
 Proof.
-  assert (isequiv_compose' : forall {A B C} (g:A.->B) (h:B.->C),
-              IsEquiv g -> IsEquiv h -> IsEquiv (composeR_ptd g h)).
-    intros; apply isequiv_compose.
-(* Why define [isequiv_compose']?  It works slightly faster in the
-following steps, since Coq doesn't need to unfold [compose_ptd] to unify
-when using it; and the saving is significant since [hfiber_to_Omega f]
-gets quite large as it unfolds. *)
-  apply @isequiv_compose'.
+  apply @isequiv_composeR_ptd.
     apply isequiv_hfiber_to_pullback.
-  apply @isequiv_compose'.
+  apply @isequiv_composeR_ptd.
     apply (pullback_fmap_isequiv _ name_point _ name_point).
       apply isequiv_hfiber_to_pullback.
       apply isequiv_idmap.
       apply isequiv_idmap.
-  apply @isequiv_compose'.
+  apply @isequiv_composeR_ptd.
     apply (pullback_fmap_isequiv _ name_point _ name_point).
       apply pullback_symm_isequiv.
       apply isequiv_idmap.
       apply isequiv_idmap.
-  apply @isequiv_compose'.
+  apply @isequiv_composeR_ptd.
     apply isequiv_inverse.
-  apply @isequiv_compose'.
+  apply @isequiv_composeR_ptd.
     apply (pullback_fmap_isequiv name_point (f o name_point)
                                  name_point name_point);
     apply isequiv_idmap.
@@ -218,7 +240,7 @@ Qed.
 
 (* Note that this must be defined as a *pointed* map, since pointedness is
 required for the functoriality of Omega, and hence for the induction step. *)
-Lemma long_exact_sequence_aux1 {X Y} (f : Y .-> X) (n:nat)
+Lemma Omega_to_hfiber_seq_0 {X Y} (f : Y .-> X) (n:nat)
   : hfiber_sequence f (n*3) .-> (iterate Omega_ptd n) X.
 Proof.
   induction n as [ | n' IH]; simpl.  
@@ -229,8 +251,8 @@ Proof.
   apply hfiber_to_Omega.
 Defined.
 
-Lemma long_exact_sequence_aux2 {X Y} (f : Y .-> X) (n:nat)
-  : IsEquiv (long_exact_sequence_aux1 f n).
+Lemma isequiv_Omega_to_hfiber_seq_0 {X Y} (f : Y .-> X) (n:nat)
+  : IsEquiv (Omega_to_hfiber_seq_0 f n).
 Proof.
   induction n as [ | n' IH].  
   (* n=0 *) simpl; apply isequiv_idmap.
@@ -238,6 +260,36 @@ Proof.
   apply @isequiv_compose with (B := Omega_ptd (hfiber_sequence f (n'*3))).
     apply isequiv_hfiber_to_Omega.
   apply isequiv_Omega_ptd_fmap, IH.
+Qed.
+
+Corollary Omega_to_hfiber_seq_1 {X Y} (f : Y .-> X) (n:nat)
+  : hfiber_sequence f (1 + n*3) .-> (iterate Omega_ptd n) Y.
+Proof.
+  apply (compose_ptd (Omega_to_hfiber_seq_0 (hfiber_incl_ptd f) n)).
+  apply equiv_path_ptd, hfiber_sequence_shift.
+Defined.
+
+Corollary isequiv_Omega_to_hfiber_seq_1 {X Y} (f : Y .-> X) (n:nat)
+  : IsEquiv (Omega_to_hfiber_seq_1 f n).
+Proof.
+  apply isequiv_compose_ptd.
+    apply isequiv_Omega_to_hfiber_seq_0.
+  exact _. (* [equiv_isequiv equiv_path] found automagically. *)
+Qed.
+
+Corollary Omega_to_hfiber_seq_2 {X Y} (f : Y .-> X) (n:nat)
+  : hfiber_sequence f (2 + n*3) .-> (iterate Omega_ptd n) (hfiber_ptd f).
+Proof.
+  apply (compose_ptd (Omega_to_hfiber_seq_1 (hfiber_incl_ptd f) n)).
+  apply equiv_path_ptd, hfiber_sequence_shift.
+Defined.
+
+Corollary isequiv_Omega_to_hfiber_seq_2 {X Y} (f : Y .-> X) (n:nat)
+  : IsEquiv (Omega_to_hfiber_seq_2 f n).
+Proof.
+  apply isequiv_compose_ptd.
+    apply isequiv_Omega_to_hfiber_seq_1.
+  exact _. (* [equiv_isequiv equiv_path] found automagically. *)
 Qed.
 
 (* TODO: also show how this interacts with the functoriality of Omega. *)
@@ -277,24 +329,25 @@ Lemma isequiv_hfiber_to_Omega_by_hand {X Y : pointed_type} (f:Y.->X)
 Proof.
   apply (isequiv_adjointify (fun p => ((point; pt_map_pt f @ p); 1))).
   (* section *) intro p; simpl.
-    apply (concat (whiskerR (concat_p1 _) _)).
-    apply concat_V_pp.
+  apply (concat (whiskerR (concat_p1 _) _)).
+  apply concat_V_pp.
   (* retraction *) intros [[y1 p] q]. simpl in *.
-    revert y1 q p.
-    refine (@id_opp_elim Y point _ _).
-    intro p; simpl.
-    assert (pt_map_pt f @ (((pt_map_pt f) ^ @ 1) @ p) = p) as H.
-      apply (concat (whiskerL _ (whiskerR (concat_p1 _) _))).
-      apply concat_p_Vp.
-    apply total_path'. simpl.
-    set (pp := @total_path _ (fun y => f y = point) (point; pt_map_pt f @ (((pt_map_pt f) ^ @ 1) @ p)) (point;p) 1 H).
-    exists pp.
-    apply (concat (transport_compose (fun (y:Y) => y = point) (hfiber_incl f point) pp _)).
-    apply (concat (transport_paths_l _ _)).
-    apply (concat (concat_p1 _)).
-    refine (@ap _ _ inverse _ 1 _).
-    admit. (* Should use the non-existent [total_path_pr1]. *)
-Defined.
+  revert y1 q p.
+  refine (@id_opp_elim Y point _ _).
+  intro p; simpl.
+  assert (pt_map_pt f @ (((pt_map_pt f) ^ @ 1) @ p) = p) as H.
+    apply (concat (whiskerL _ (whiskerR (concat_p1 _) _))).
+    apply concat_p_Vp.
+  apply total_path'. simpl.
+  set (pp := @total_path _ (fun y => f y = point) (point; pt_map_pt f @ (((pt_map_pt f) ^ @ 1) @ p)) (point;p) 1 H).
+  exists pp.
+  apply (concat (transport_compose (fun (y:Y) => y = point) (hfiber_incl f point) pp _)).
+  apply (concat (transport_paths_l _ _)).
+  apply (concat (concat_p1 _)).
+  refine (@ap _ _ inverse _ 1 _).
+  refine (@total_path_pr1 _ _
+    (point; pt_map_pt f @ (((pt_map_pt f) ^ @ 1) @ p)) (point; p) 1 H).
+Qed.
 
 (*
 Local Variables:

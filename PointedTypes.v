@@ -130,6 +130,26 @@ Proof.
   apply (concat (ap inverse (pt_htpy_pt H))). apply inv_pV.
 Defined.
 
+(* This lemma and the next are, logically speaking, redundant: they are
+simply aliases for [isequiv_compose] acting on the underlying functions
+of a pointed composite.
+
+However, when working with a large composite, these save a lot of time,
+since Coq can recognise where to break the pointed composite, rather than
+having to unfold [compose_ptd] and try multiple break-points in the under-
+lying map. *)
+Lemma isequiv_compose_ptd {X Y Z} (f:Y.->Z) (g:X.->Y) 
+  : IsEquiv f -> IsEquiv g -> IsEquiv (compose_ptd f g).
+Proof.
+  intros; apply isequiv_compose.
+Defined.
+
+Lemma isequiv_composeR_ptd {X Y Z} (g:X.->Y) (f:Y.->Z) 
+  : IsEquiv g -> IsEquiv f -> IsEquiv (composeR_ptd g f).
+Proof.
+  intros; apply isequiv_compose.
+Defined.
+
 (* Useful fact: the inverse of a pointed equivalence is also pointed. *)
 Definition equiv_inverse_ptd {A B} (f : A .-> B) {f_iseq : IsEquiv f}
   : B .-> A.
@@ -140,6 +160,16 @@ Proof.
 Defined.
 
 Canonical Structure equiv_inverse_ptd.
+
+(* The equivalence produced by [equiv_path] on an equality of pointed types
+is always pointed. *)
+Lemma equiv_path_ptd {X Y : pointed_type} (p : X = Y)
+  : X .-> Y.
+Proof.
+  exists (equiv_path X Y (ap pt_type p)); simpl. 
+  refine ((transport_compose _ _ _ _)^ @ _).
+  apply apD.
+Defined.
 
 End Pointed_Maps.
 

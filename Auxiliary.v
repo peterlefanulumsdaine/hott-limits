@@ -68,6 +68,14 @@ Proof.
   intros [p q]. apply (total_path p q).
 Defined.
 
+Definition total_path_pr1 {A : Type} {P : A -> Type} {x y: {a : A & P a}}
+  (p : pr1 x = pr1 y) (q : transport P p (pr2 x) = pr2 y)
+: base_path (total_path p q) = p.
+Proof.
+  destruct x as [x1 x2], y as [y1 y2]. simpl in *.
+  destruct p, q; simpl. exact 1.
+Defined.
+
 Definition path_space (A : Type) := { x:A & { y:A & x = y }}.
 
 (* Useful mainly for the idiom [apply (concatR (expression))]. *)
