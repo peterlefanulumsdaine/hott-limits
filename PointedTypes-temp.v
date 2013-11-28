@@ -19,6 +19,7 @@ Pointed types.
 
 *******************************************************************************)
 
+(* TODO (high): consistentize use of capital letters, throughout development *)
 Section Pointed_Types.
 
 Record pointed_type := mk_pointed_type {
@@ -40,7 +41,7 @@ Record pointed_htpy {X Y} (f g : pointed_map X Y)
   pt_htpy_pt : pt_htpy point = (pt_map_pt f) @ (pt_map_pt g)^ }.
 
 Global Arguments pt_htpy [X Y f g] H x : rename.
-(* Note: this and some other coercions don't work well. *)
+(* [pt_htpy] seems not to work as coercion.  TODO: investigate? *)
 Global Arguments pt_htpy_pt [X Y f g] H : rename.
 Global Arguments mk_pointed_htpy [X Y f g] H Hpt : rename.
 
@@ -56,7 +57,8 @@ Notation "f .== g" := (pointed_htpy f g)
   the point as pointed maps. *)
 Notation "[ 'defpointed' f ]" := {| pt_map := f; pt_map_pt := 1 |}
   (at level 40).
-(* Note: this often doesn't work, e.g. for the pointed pullback projections. *)
+(* Note: this often doesn't work, e.g. for the pointed pullback projections.
+TODO: understand better why not! *)
 
 (*******************************************************************************
 
@@ -81,6 +83,10 @@ Definition compose_ptd {X Y Z} (f : Y .-> Z) (g : X .-> Y)
 := {| pt_map := f o g ; pt_map_pt := (ap f (pt_map_pt g) @ pt_map_pt f) |}.
 
 Canonical Structure compose_ptd.
+(* Doesn't seem to work, e.g. in [is_exact] below.  TODO (low): investigate? 
+TODO (mid): in meantime, make better notation for this??  Problem:
+none of the obvious candidates [f .o g], [f o. g], [f o.o g] work, due
+to Coq's special treatment of the period. *)
 
 Definition composeR_ptd {X Y Z} (g : X .-> Y) (f : Y .-> Z)
 := compose_ptd f g.
@@ -279,6 +285,7 @@ Definition cospan_map_of_ptd_cospan_map
 
 Coercion cospan_map_of_ptd_cospan_map : ptd_cospan_map >-> cospan_map.
 
+(*TODO (low): this seems unnecessarily painful!  Simplify??*)
 Lemma pullback_ptd_fmap
   {A B C} {f : A .-> C} {g : B .-> C}
   {A' B' C'} {f' : A' .-> C'} {g' : B' .-> C'}
@@ -313,14 +320,14 @@ Proof.
   apply (concat (inv_pp _ _)). apply concat2; apply inv_V.
 Defined.
 
+(*TODO (low): this seems unnecessarily painful!  Simplify??*)
 Definition outer_to_double_pullback_ptd {A B1 B2 C}
   (f : A .-> C) (g : B1 .-> C) (h : B2 .-> B1)
 : (pullback_ptd f (compose_ptd g h)) .-> (pullback_ptd (pullback_ptd_pr2 f g) h).
 Proof.
   exists (outer_to_double_pullback f g h).
   apply pullback_path'. 
-    assert ((1 @ (pt_map_pt f @ (ap g (pt_map_pt h) @ pt_map_pt g) ^))
-            @ ap g (pt_map_pt h)
+    assert ((1 @ (pt_map_pt f @ (ap g (pt_map_pt h) @ pt_map_pt g) ^)) @ ap g (pt_map_pt h)
              = pt_map_pt f @ (pt_map_pt g) ^) as H.
       apply moveR_pM.
       apply (concat (concat_1p _)).
@@ -391,6 +398,7 @@ Definition Omega_ptd (A:pointed_type) : pointed_type
 := {| pt_type := Omega A point;
       point := idpath point |}.
 
+(* Doesn't seem to work, eg in [Omega_ptd_fmap] below.  TODO: figure out issue? *)
 Canonical Structure Omega_ptd.
 
 Definition Omega_ptd_fmap {A B : pointed_type} (f : A .-> B)
@@ -446,6 +454,9 @@ Proof.
   apply moveR_Vp. apply (concat (pt_htpy_pt H)); simpl.
   apply concat_p1.
 Defined.
+
+(* TODO (mid): show that this is a factorisation of [g], i.e. that 
+[compose_ptd (hfiber_incl f) (hfiber_factorisation g f H) .== g].  *)
 
 (* A pair of pointed maps, together with a nullhomotopy of their composite,
 is called "exact" if the induced map to the hfiber is an equivalence. *)

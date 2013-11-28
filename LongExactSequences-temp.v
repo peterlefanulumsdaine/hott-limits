@@ -73,7 +73,6 @@ Definition lseq_template (n:nat) : long_sequence
 
 End Long_Sequence_Template.
 
-
 (*******************************************************************************
 
 The fiber sequence of a pointed map.
@@ -262,6 +261,63 @@ Proof.
   apply isequiv_compose_ptd.
     apply isequiv_Omega_to_hfiber_seq_1.
   exact _. (* [equiv_isequiv equiv_path] found automagically. *)
+Qed.
+
+(* TODO: also show how this interacts with the functoriality of Omega. *)
+
+(*******************************************************************************
+Application of the LES: equivalence of loop spaces, via truncatedness of fibers.
+
+Goal of the section: if [X -> Y] has [n]-truncated fibers, then
+[Omega ^n X <~> Omega ^n Y].
+*******************************************************************************)
+
+Corollary isequiv_loop_space_map_from_trunc_fiber
+  {Y X} (f : Y .-> X)
+  {n:nat} (Hn : forall x:X, IsTrunc n (hfiber f x))
+: IsEquiv (Omega_ptd_fmap_iterate f n).
+Proof.
+Admitted.
+
+(*******************************************************************************
+
+An alternative construction of the [hiber_to_Omega] equivalence, this time by
+hand instead of via pullbacks.  Though elementary, this is not quite as
+straightforward as one might expect.
+
+*******************************************************************************)
+
+Lemma hfiber_to_Omega_by_hand {X Y : pointed_type} (f:Y.->X)
+: (hfiber_ptd (hfiber_incl_ptd f)) .-> Omega_ptd X.
+Proof.
+  exists (fun y1_p_q =>
+    match y1_p_q with ((y1;p);q) => ((pt_map_pt f)^ @ (ap f q)^ @ p) end).
+  simpl. exact (whiskerR (concat_p1 _) _ @ concat_Vp _).
+Defined.
+
+Lemma isequiv_hfiber_to_Omega_by_hand {X Y : pointed_type} (f:Y.->X)
+: IsEquiv (hfiber_to_Omega_by_hand f).
+Proof.
+  apply (isequiv_adjointify (fun p => ((point; pt_map_pt f @ p); 1))).
+  (* section *) intro p; simpl.
+  apply (concat (whiskerR (concat_p1 _) _)).
+  apply concat_V_pp.
+  (* retraction *) intros [[y1 p] q]. simpl in *.
+  revert y1 q p.
+  refine (@id_opp_elim Y point _ _).
+  intro p; simpl.
+  assert (pt_map_pt f @ (((pt_map_pt f) ^ @ 1) @ p) = p) as H.
+    apply (concat (whiskerL _ (whiskerR (concat_p1 _) _))).
+    apply concat_p_Vp.
+  apply total_path'. simpl.
+  set (pp := @total_path _ (fun y => f y = point) (point; pt_map_pt f @ (((pt_map_pt f) ^ @ 1) @ p)) (point;p) 1 H).
+  exists pp.
+  apply (concat (transport_compose (fun (y:Y) => y = point) (hfiber_incl f point) pp _)).
+  apply (concat (transport_paths_l _ _)).
+  apply (concat (concat_p1 _)).
+  refine (@ap _ _ inverse _ 1 _).
+  refine (@total_path_pr1 _ _
+    (point; pt_map_pt f @ (((pt_map_pt f) ^ @ 1) @ p)) (point; p) 1 H).
 Qed.
 
 (*

@@ -38,14 +38,17 @@ Proof.
   exists (pr1 btp). exact (pr2 (pr2 btp)).
 Defined.
 
-Lemma hfiber_as_pullback_equiv {A B : Type} (f : B -> A) (a : A):
-  (hfiber f a) <~> (pullback f (name a)).
+Lemma isequiv_hfiber_to_pullback {A B : Type} (f : B -> A) (a : A)
+  : IsEquiv (hfiber_to_pullback f a).
 Proof.
-  exists (hfiber_to_pullback f a).
   apply (isequiv_adjointify (pullback_to_hfiber f a)).
   (* is_section *) intros [b [[] p]]. exact 1.
   (* is_retraction *) intros [b p]. exact 1.
 Defined.
+
+Definition hfiber_to_pullback_equiv {A B : Type} (f : B -> A) (a : A)
+  : (hfiber f a) <~> (pullback f (name a))
+:= BuildEquiv (isequiv_hfiber_to_pullback f a).
 
 End Hfiber_as_Pullback.
 
@@ -63,35 +66,55 @@ Section Loops.
 Definition Omega (A : Type) (a0 : A) : Type
 := (a0 = a0).
 
-Definition loop_to_pullback {A : Type} {a0 : A} (l : Omega A a0)
+Definition Omega_to_pullback {A : Type} {a0 : A} (l : Omega A a0)
 : pullback (name a0) (name a0).
 Proof.
   exists tt. exists tt. exact l.
 Defined.
 
-Definition pullback_to_loop {A : Type} {a0 : A}
+Definition pullback_to_Omega {A : Type} {a0 : A}
   (tsl : pullback (name a0) (name a0))
 : Omega A a0.
 Proof.
   destruct tsl as [[] [[] l]]. exact l.
 Defined.
 
-Lemma loop_is_pullback {A : Type} {a0 : A}
-: (Omega A a0) <~> (pullback (name a0) (name a0)).
+Lemma isequiv_Omega_to_pullback {A : Type} (a0 : A)
+: IsEquiv (@Omega_to_pullback A a0).
 Proof.
-  exists (loop_to_pullback).
-  apply (isequiv_adjointify (pullback_to_loop)).
-  (* is_section *)
-  intros [[] [[] l]]. exact 1.
-  (* is_retraction *)
-  intros l. exact 1.
-Defined.
+  apply (isequiv_adjointify (pullback_to_Omega)).
+  (* is_section *) intros [[] [[] l]]. exact 1.
+  (* is_retraction *) intros l. exact 1.
+Qed.
+
+Definition Omega_to_pullback_equiv {A : Type} {a0 : A}
+: (Omega A a0) <~> (pullback (name a0) (name a0))
+:= BuildEquiv (isequiv_Omega_to_pullback a0).
 
 Definition Omega_fmap {A B : Type} (a0 : A) (f : A->B)
 : (Omega A a0) -> (Omega B (f a0)).
 Proof.
   exact (ap f).
 Defined.
+
+Instance isequiv_Omega_fmap {A B : Type} (a0 : A) (f : A->B)
+: IsEquiv f -> IsEquiv (Omega_fmap a0 f).
+Proof.
+  intros f_iseq. apply isequiv_ap; assumption.
+Qed.
+
+Definition Omega_conj {A} {a0 a1:A} (p:a0 = a1)
+: Omega A a0 -> Omega A a1.
+Proof.
+  exact ((concatR p) o (concat p^)).
+Defined.
+
+Instance isequiv_Omega_conj {A} {a0 a1:A} (p:a0 = a1)
+: IsEquiv (Omega_conj p).
+Proof.
+  apply isequiv_compose.
+  (* [isequiv_concat], [isequiv_concatR] found automatically! *)
+Qed.
 
 End Loops.
 
@@ -225,10 +248,10 @@ Lemma hfiber_of_pullback {A B C:Type} (f:A->C) (g:B->C)
 Proof.
   intros a.
   equiv_via (pullback (f^* g) (name a)).
-    apply hfiber_as_pullback_equiv.
+    apply hfiber_to_pullback_equiv.
   equiv_via (pullback g (f o (name a))).
     apply equiv_inverse. apply two_pullbacks_equiv.
-  apply equiv_inverse. apply hfiber_as_pullback_equiv.
+  apply equiv_inverse. apply hfiber_to_pullback_equiv.
 Defined.
 
 Lemma pullback_preserves_equiv {A B C:Type} (f:A->C) (g:B->C)

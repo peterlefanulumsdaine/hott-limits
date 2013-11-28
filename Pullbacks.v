@@ -60,7 +60,7 @@ Proof.
   exact ((concat_1p _)^ @ (concat_p1 _)^ @ r).
 Defined.
 
-Arguments pullback_path : simpl nomatch.
+Global Arguments pullback_path : simpl never.
 
 (* Alias of [pullback_path]; useful for [apply]ing and then using
    [exists] to supply the arguments (compare [total_path']). *)
@@ -74,6 +74,8 @@ Definition pullback_path' {A B C : Type} {f : A -> C} {g : B -> C}
 Proof.
   intros [p [q r]]. apply (pullback_path u u' p q r).
 Defined.
+
+Global Arguments pullback_path' [_ _ _ _ _] _ _ _ : simpl never.
 
 Definition pullback_path_pr1 {A B C : Type} {f : A -> C} {g : B -> C}
   (u u' : pullback f g)
@@ -100,9 +102,31 @@ Definition pullback_path_pr2 {A B C : Type} {f : A -> C} {g : B -> C}
 Proof.
   destruct u as [a [b c]], u' as [a' [b' c']].
   unfold pullback_pr2 in q. simpl in p, q.
-  destruct p, q. simpl.
+  destruct p, q. unfold pullback_path; simpl.
   rewrite <- ! ap_compose.
   apply ap_const.
+Defined.
+
+Definition pullback_path'_pr1 {A B C : Type} {f : A -> C} {g : B -> C}
+  (u u' : pullback f g)
+  (pqr : { p : pullback_pr1 u = pullback_pr1 u'
+    & {q : pullback_pr2 u = pullback_pr2 u'
+    & (ap f p)^ @ (pullback_comm u) @ (ap g q)
+      = pullback_comm u' } })
+: ap pullback_pr1 (pullback_path' u u' pqr) = pr1 pqr.
+Proof.
+  destruct pqr as [p [q r]]. apply pullback_path_pr1.
+Defined.
+
+Definition pullback_path'_pr2 {A B C : Type} {f : A -> C} {g : B -> C}
+  (u u' : pullback f g)
+  (pqr : { p : pullback_pr1 u = pullback_pr1 u'
+    & {q : pullback_pr2 u = pullback_pr2 u'
+    & (ap f p)^ @ (pullback_comm u) @ (ap g q)
+      = pullback_comm u' } })
+: ap pullback_pr2 (pullback_path' u u' pqr) = pr1 (pr2 pqr).
+Proof.
+  destruct pqr as [p [q r]]. apply pullback_path_pr2.
 Defined.
 
 End Concrete_Pullbacks.
