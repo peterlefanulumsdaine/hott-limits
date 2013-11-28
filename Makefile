@@ -24,10 +24,12 @@ fundamentals: auxiliary
 	$(COQC) Fundamentals.v
 
 limits-common: fundamentals
-	$(COQC) CommutativeSquares.v Equalizers.v
+	$(COQC) CommutativeSquares.v
+	$(COQC) Equalizers.v
 
 pullbacks: limits-common
-	$(COQC) Pullbacks.v Pullbacks2.v
+	$(COQC) Pullbacks.v
+	$(COQC) Pullbacks2.v
 
 twopullbacks: pullbacks
 	$(COQC) Pullbacks3.v
@@ -36,7 +38,8 @@ twopullbacksalt: pullbacks
 	$(COQC) Pullbacks3_alt.v
 
 limits: limits-common arith pullbacks
-	$(COQC) Limits.v Limits2.v
+	$(COQC) Limits.v
+	$(COQC) Limits2.v
 
 pointedtypes: pullbacks
 	$(COQC) PointedTypes.v
