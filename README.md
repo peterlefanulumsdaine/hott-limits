@@ -19,7 +19,7 @@ To balance the competing demands of an academic publication and a software libra
 
 # Getting started #
 
-To run/compile our files, you will need to download the HoTT library and a compatible version of Coq. To obtain these, follow the directions in the README and INSTALL files at (the HoTT/HoTT github repository)[https://github.com/HoTT/HoTT].
+To run/compile our files, you will need to download the HoTT library and a compatible version of Coq. To obtain these, follow the directions in the README and INSTALL files at [the HoTT/HoTT github repository](https://github.com/HoTT/HoTT).
 
 Once you have these, assuming `hoqc` is in your system path, typing the command
 
