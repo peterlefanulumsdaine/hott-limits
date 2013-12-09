@@ -30,8 +30,8 @@ Record long_sequence := {
   lseq_maps : forall n:nat, lseq_obs (1+n) .-> lseq_obs n;
   lseq_null : forall n:nat, compose_ptd (lseq_maps n) (lseq_maps (1+n)) .== point }.
 
-Definition lseq_is_exact (X : long_sequence)
-  := forall n, is_exact (lseq_maps X (1+n)) (lseq_maps X n) (lseq_null X n).
+Definition lseq_is_hfiber (X : long_sequence)
+  := forall n, is_hfiber (lseq_maps X (1+n)) (lseq_maps X n) (lseq_null X n).
 
 End Long_Sequences.
 
@@ -78,10 +78,10 @@ End Long_Sequence_Template.
 
 The fiber sequence of a pointed map.
 
-We first construct the long exact sequence of a pointed map simply by iteratedly
-taking its fiber.  Constructed this way, it is evidently exact.  We then show,
-in [Omega_to_hfiber_seq_0] et seq., that it is equivalent to a sequence of loop
-spaces.
+We first construct the fibration sequence of a pointed map simply by iteratedly
+taking its fiber.  Constructed this way, it is trivially exact at each step.
+We then show, in [Omega_to_hfiber_seq_0] et seq., that it is equivalent to a 
+sequence of loop spaces.
 
 *******************************************************************************)
 
@@ -104,10 +104,10 @@ Definition hfiber_sequence {A B} (f : B .-> A) : long_sequence
       lseq_maps n := pr2 (pr2 (hfiber_sequence_aux f n));
       lseq_null n := hfiber_null _ |}.
 
-Lemma is_exact_hfiber_sequence {A B} (f : B .-> A)
-  : lseq_is_exact (hfiber_sequence f).
+Lemma is_hfiber_hfiber_sequence {A B} (f : B .-> A)
+  : lseq_is_hfiber (hfiber_sequence f).
 Proof.
-  intro; apply (is_exact_hfiber _).
+  intro; apply (is_hfiber_hfiber _).
 Qed.
 
 Lemma hfiber_sequence_shift_aux {A B} (f : B .-> A) (n:nat)

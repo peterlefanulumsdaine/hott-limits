@@ -459,18 +459,20 @@ Defined.
 [compose_ptd (hfiber_incl f) (hfiber_factorisation g f H) .== g].  *)
 
 (* A pair of pointed maps, together with a nullhomotopy of their composite,
-is called "exact" if the induced map to the hfiber is an equivalence. *)
-Definition is_exact {Z Y X} (g : Z .-> Y) (f : Y .-> X)
+"is an hfiber sequence" if the induced map to the (standardly constructed)
+hfiber is an equivalence.  This is an analogue, at the level of spaces, for
+exactness on homotopy/homology. *)
+Definition is_hfiber {Z Y X} (g : Z .-> Y) (f : Y .-> X)
   (H : compose_ptd f g .== point)
 := IsEquiv (hfiber_factorisation g f H).
 (* Note that this really can depend on [H], not just on [f] and [g].
 Consider the sequence [Int -> 1 -> S1]: with the nullhomotopy
 [fun n => loop ^n], it is exact, but with [fun _ => refl], it is not. *)
 
-Definition is_exact_hfiber {Y X} (f : Y .-> X)
-  : is_exact (hfiber_incl_ptd f) f (hfiber_null f).
+Definition is_hfiber_hfiber {Y X} (f : Y .-> X)
+  : is_hfiber (hfiber_incl_ptd f) f (hfiber_null f).
 Proof.
-  unfold is_exact.
+  unfold is_hfiber.
   apply isequiv_homotopic with (idmap_ptd _).
   apply isequiv_idmap.
   intros [y p]; exact 1.
