@@ -49,17 +49,23 @@ The files in the library are as follows:
 
 # Versions and compatibility #
 
-These files have been tested under the following version of the HoTT library:
+These files are written for the customised version of Coq 8.4 included with the HoTT library.
 
-  ccf55c60b90404611f1dd377a4e47a12fae08c05
-  
-We used the following version of Coq 8.4:
+We aim to keep this development compatible with the latest version of the HoTT library.  Specifically, our revision 662e9df has been tested using HoTT revision 2abb906:
 
-  0e7800c3f9fbb7313c8f1ad194e8163988ec6ecd
+  https://github.com/HoTT/HoTT/commit/2abb906
   
-This library may evolve in the future. The latest version can be found at:
+This development may evolve in the future. The latest version can always be found at:
 
   https://github.com/peterlefanulumsdaine/hott-limits
+
+The version submitted with the MSCS paper is archived, frozen, at:
+
+  https://github.com/peterlefanulumsdaine/hott-limits/tree/MSCS
+
+A branch based on that version, but minimally maintained for compatibility, is at:
+
+  https://github.com/peterlefanulumsdaine/hott-limits/tree/v1
   
 # Licensing #
 
