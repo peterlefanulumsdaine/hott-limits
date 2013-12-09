@@ -51,7 +51,7 @@ The files in the library are as follows:
 
 These files are written for the customised version of Coq 8.4 included with the HoTT library.
 
-We aim to keep this development compatible with the latest version of the HoTT library.  Specifically, our revision 662e9df has been tested using HoTT revision 2abb906:
+We aim to keep this development compatible with the latest version of the HoTT library.  Specifically, our revision eed93f2 has been tested using HoTT revision 2abb906:
 
   https://github.com/HoTT/HoTT/commit/2abb906
   
