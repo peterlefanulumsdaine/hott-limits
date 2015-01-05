@@ -98,11 +98,11 @@ Proof.
   apply (isequiv_adjointify (str_pullback_along_fib_inv B f)).
   (* is_section *)
   intros [a b]; simpl.
-  apply total_path'. exists (eisretr f a); simpl.
+  apply path_sigma_uncurried. exists (eisretr f a); simpl.
   apply transport_pV.
   (* is_retraction *)
   intros [c b]. simpl.
-  apply total_path'. simpl. exists (eissect f c).
+  apply path_sigma_uncurried. simpl. exists (eissect f c).
   apply (concat (transport_compose B f _ _)).
   apply (concat (transport_pp _ _ _ b)^).
   apply (@ap _ _ (fun p => p # b) _ 1).
@@ -219,11 +219,11 @@ Definition equiv_two_of_three_composite {X Y Z : Type} (f: X -> Y) (g: Y -> Z)
 
 Definition equiv_two_of_three_left {X Y Z : Type} (f: X -> Y) (g: Y -> Z)
   : IsEquiv f -> IsEquiv (g o f) -> IsEquiv g
-:= (fun _ _ => Equivalences.cancelR_isequiv g).
+:= (fun _ _ => Equivalences.cancelR_isequiv f).
 
 Definition equiv_two_of_three_right {X Y Z : Type} (f: X -> Y) (g: Y -> Z)
   : IsEquiv g -> IsEquiv (g o f) -> IsEquiv f
-:= (fun _ _ => Equivalences.cancelL_isequiv f).
+:= (fun _ _ => Equivalences.cancelL_isequiv g).
 
 (*******************************************************************************
 2 out of 6: a strengthening of the 2 out of 3 property,
@@ -268,7 +268,7 @@ Lemma two_of_six_g {X Y Z W : Type} (f: X -> Y) (g: Y -> Z) (h: Z -> W)
 : IsEquiv (h o g) -> IsEquiv (g o f) -> IsEquiv g.
 Proof.
   intros hg_iseq gf_iseq.
-  apply equiv_biinv; split.
+  apply isequiv_biinv; split.
   (* left inverse*) exists ((h o g)^-1 o h). apply eissect.
   (* right inverse*) exists (f o (g o f)^-1). apply (eisretr (g o f)).
 Qed.

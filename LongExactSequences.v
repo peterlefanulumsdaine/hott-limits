@@ -310,14 +310,14 @@ Proof.
   assert (pt_map_pt f @ (((pt_map_pt f) ^ @ 1) @ p) = p) as H.
     apply (concat (whiskerL _ (whiskerR (concat_p1 _) _))).
     apply concat_p_Vp.
-  apply total_path'. simpl.
+  apply path_sigma_uncurried. simpl.
   set (pp := @total_path _ (fun y => f y = point) (point; pt_map_pt f @ (((pt_map_pt f) ^ @ 1) @ p)) (point;p) 1 H).
   exists pp.
   apply (concat (transport_compose (fun (y:Y) => y = point) (hfiber_incl f point) pp _)).
   apply (concat (transport_paths_l _ _)).
   apply (concat (concat_p1 _)).
   refine (@ap _ _ inverse _ 1 _).
-  refine (@total_path_pr1 _ _
+  refine (@pr1_path_sigma _ _
     (point; pt_map_pt f @ (((pt_map_pt f) ^ @ 1) @ p)) (point; p) 1 H).
 Qed.
 

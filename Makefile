@@ -38,7 +38,7 @@ twopullbacksalt: pullbacks
 	$(COQC) Pullbacks3_alt.v
 
 limits: limits-common arith pullbacks
-	$(COQC) Limits.v
+	$(COQC) Limits1.v
 	$(COQC) Limits2.v
 
 pointedtypes: pullbacks

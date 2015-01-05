@@ -62,7 +62,7 @@ Proof.
   apply (concat (ap_pp (wB ^-1) _ _)^), (concatR (ap_compose wB _ _)^). 
   apply ap, (concat concat_pp_p), moveR_Vp.
   path_via (ap (f' o wA) (eissect wA a) @ wf a).
-    apply whiskerR, (concatR (ap_compose _ _ _)^).
+    apply whiskerR.  apply (concatR (ap_compose wA f' _)^).
     apply ap, eisadj.
   apply (concat (concat_Ap wf _)).
   apply whiskerL, (ap_compose f wB).

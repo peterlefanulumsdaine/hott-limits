@@ -63,7 +63,7 @@ Defined.
 Global Arguments pullback_path : simpl never.
 
 (* Alias of [pullback_path]; useful for [apply]ing and then using
-   [exists] to supply the arguments (compare [total_path']). *)
+   [exists] to supply the arguments (compare [path_sigma_uncurried]). *)
 Definition pullback_path' {A B C : Type} {f : A -> C} {g : B -> C}
   (u u' : pullback f g)
 : { p : pullback_pr1 u = pullback_pr1 u'
@@ -381,7 +381,7 @@ Lemma pullback_universal_unlock
 : @pullback_universal = @pullback_universal_transparent.
 Proof.
   do 5 (apply path_forall; intro). 
-  apply @allpath_hprop, hprop_is_pullback_cone.
+  apply hprop_is_pullback_cone.
 Qed.
 
 End Pullback_UP.
