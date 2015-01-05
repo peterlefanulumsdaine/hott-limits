@@ -316,20 +316,20 @@ Proof.
   intros alpha.
   unfold left_cospan_cone_to_composite_UP_equiv2, left_cospan_cone_to_composite,
     map_to_cospan_cone.
-  simpl. unfold compose. simpl.
+  simpl. simpl.
   unfold pullback_pr2, pullback_pr1. simpl.
   unfold cospan_cone_map_to_pullback_equiv. simpl.
   unfold equiv_postcompose'. simpl.
   unfold equiv_inv. simpl.
   unfold cospan_cone_map2, cospan_cone_map1,cospan_cone_comm. simpl.
   unfold cospan_cone_map2, cospan_cone_map1,cospan_cone_comm. simpl.
-  unfold compose, idmap. simpl.
+  idmap. simpl.
   set (pg := pr1 P1). set (pf := pr1 (pr2 P1)).
     set (phi := pr2 (pr2 P1)).
   set (ph := pr1 P2). set (ppf := pr1 (pr2 P2)).
     set (psi := pr2 (pr2 P2)).
   unfold projT1, projT2. simpl.
-  unfold map_to_cospan_cone, compose. simpl.
+  unfold map_to_cospan_cone. simpl.
   unfold cospan_cone_map2, cospan_cone_comm. simpl.
   assert (id_elim_lemma :
     forall (x:X) (b:B1) (q : b = h (ppf (alpha x)))
@@ -365,7 +365,7 @@ Proof.
         (p @ ap g (q^))).
     intros x b q p. destruct q. simpl.
     unfold id_opp_elim. simpl.
-    unfold compose. apply ap.
+    apply ap.
     apply inverse. apply concat_p1.
     (* id_elim_lemma' proven *)
     intros x b q. rewrite <- (inv_V _ _ _ q).
@@ -706,7 +706,7 @@ Proof.
   set (C2_UP_at_X := BuildEquiv (pullback_cone_UP P2 X)).
   intros m4. (* corresponds to C4 in previous direction *)
   unfold left_cospan_cone_to_composite_UP_inverse.
-  fold C1_UP_at_X. fold C2_UP_at_X.  unfold compose.  simpl.
+  fold C1_UP_at_X. fold C2_UP_at_X.   simpl.
     apply moveR_I.  simpl.
   apply cospan_cone_path'. simpl.
     exists (UP_inverse_left_cospan_cone_to_composite P1 P2 m4).

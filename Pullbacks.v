@@ -360,7 +360,7 @@ Proof.
   intros [y1 [y2 y3]].
   unfold map_to_cospan_cone, cospan_cone_to_map_to_pullback.
   unfold cospan_cone_map2, cospan_cone_comm; simpl.
-  unfold pullback_comm, compose; simpl.
+  unfold pullback_comm; simpl.
   exact 1.
   (* is_retraction *)
   intros m. apply path_forall.
@@ -745,7 +745,7 @@ Lemma pullback_fmap_comp
   == (pullback_fmap h) o (pullback_fmap k).
 Proof.
   destruct h as [hA hB hC hf hg], k as [kA kB kC kf kg].
-  intros [a [b p]]. unfold cospan_comp, compose; simpl.
+  intros [a [b p]]. unfold cospan_comp; simpl.
   apply pullback_path'. simpl.
   exists 1, 1. simpl.
   apply (concat (concat_p1 _)), (concat (concat_1p _)).
@@ -883,8 +883,9 @@ Definition packed_cospan_cone_map1
   (P_UP_at_X := BuildEquiv (pullback_cone_UP P X))
 : (cospan_cone_map1 P) o (P_UP_at_X ^-1 CX) = cospan_cone_map1 CX.
 Proof.
-  change (compose (cospan_cone_map1 P)) with (cospan_cone_map1 o P_UP_at_X).
-  unfold compose. apply ap, eisretr.
+  change (cospan_cone_map1 P o P_UP_at_X^-1 CX)
+    with (cospan_cone_map1 (P_UP_at_X (P_UP_at_X^-1 CX))).
+  apply ap, eisretr.
 Defined.
 
 Definition packed_cospan_cone_map2
@@ -893,8 +894,9 @@ Definition packed_cospan_cone_map2
   (P_UP_at_X := BuildEquiv (pullback_cone_UP P X))
 : (cospan_cone_map2 P) o (P_UP_at_X ^-1 CX) = cospan_cone_map2 CX.
 Proof.
-  change (compose (cospan_cone_map2 P)) with (cospan_cone_map2 o P_UP_at_X).
-  unfold compose. apply ap, eisretr.
+  change (cospan_cone_map2 P o P_UP_at_X^-1 CX)
+    with (cospan_cone_map2 (P_UP_at_X (P_UP_at_X^-1 CX))).
+  apply ap, eisretr.
 Defined.
 
 Definition packed_cospan_cone_comm
@@ -952,7 +954,7 @@ Proof.
          (pullback_pr2 (abpdq)).
   path_via (g (pullback_pr2 (pullback_pr1 abpdq))).
     apply pullback_comm.
-  unfold compose. apply ap, pullback_comm.
+  apply ap, pullback_comm.
 Defined.
 
 Lemma two_pullbacks_isequiv: IsEquiv (outer_to_double_pullback).
@@ -969,7 +971,7 @@ Proof.
   apply (concatR (inv_V _)), ap.
   apply (pullback_path_pr2 (a; (h d; p @ ap g q)) (a; (b; p))).
   (* is_retraction *)
-  unfold compose. intros [a [d p]]. simpl. 
+  intros [a [d p]]. simpl. 
   apply pullback_path'. exists 1, 1. simpl.
   apply (concat (concat_p1 _)), (concat (concat_1p _)).
   apply concat_p1.

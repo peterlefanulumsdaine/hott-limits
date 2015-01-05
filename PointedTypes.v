@@ -404,7 +404,7 @@ Definition Omega_ptd_fmap {A B : pointed_type} (f : A .-> B)
 : (Omega_ptd A) .-> (Omega_ptd B).
 Proof.
   exists (Omega_conj (pt_map_pt f) o Omega_fmap point f).
-  unfold Omega_conj, compose, concatR; simpl.
+  unfold Omega_conj, concatR; simpl.
   path_via ((pt_map_pt f)^ @ pt_map_pt f).
   apply whiskerR, concat_p1.
   apply concat_Vp.

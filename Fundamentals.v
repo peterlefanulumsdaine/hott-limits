@@ -237,12 +237,12 @@ Proof.
   intros hg_iseq gf_iseq.
   apply isequiv_adjointify with ((g o f) ^-1 o g o (h o g) ^-1).
   (* is_section *)
-  intros y. unfold compose; simpl.
+  intros y. simpl.
   path_via (h ( g ((h o g) ^-1 y))).
     apply ap. apply (eisretr (g o f)).
     apply (eisretr (h o g)).
   (* is_retraction *)
-  intros x. unfold compose; simpl.
+  intros x. simpl.
   path_via ((g o f) ^-1 (g (f x))).
     repeat apply ap. apply (eissect (h o g)).
     apply (eissect (g o f)).
@@ -258,7 +258,8 @@ Proof.
   (* is_retraction *)
   intros z.
   path_via ((g o (h o g) ^-1) (h (g (f ((g o f)^-1 z))))).
-    apply ap, ap, inverse, (eisretr (g o f)).
+    set (ghgi := g o (h o g)^-1).
+    apply ap, ap, ap, inverse, (eisretr (g o f)).
   path_via (g (f ((g o f)^-1 z))).
     apply (ap g), (eissect (h o g)).
   apply (eisretr (g o f)).

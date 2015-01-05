@@ -216,7 +216,7 @@ Definition limit_graph_cone (D : diagram G)
 : graph_cone D (limit D).
 Proof.
   exists (fun i x => x i).
-  intros i j f x. unfold compose; simpl. exact (lim_pr2 x f).
+  intros i j f x. simpl. exact (lim_pr2 x f).
 Defined.
 
 (* TODO: should D and X be implicit here and in the next definition?
@@ -554,10 +554,10 @@ Proof.
   intros i j f.
   rewrite concat_p1.
   unfold comm_square_comp.
-  rewrite ap_compose.
+  rewrite (ap_compose (m1_obj j) (m2_obj j)).
   rewrite ap_pp.
   apply (concat (concat_1p _)).
-  apply concat_p_pp.
+    apply concat_p_pp.
 Defined.
 
 End Limit_Functoriality.
@@ -637,7 +637,7 @@ Definition lim_as_eq_cone (D : diagram G)
 Proof.
   unfold graph_cone.
   exists (fun i x => (pr1 x) i).
-  intros i j f x. unfold compose.
+  intros i j f x.
   set (x2 := pr2 x). simpl in x2.
   apply (ap10 (apD10 (apD10 x2 i) j) f).
 Defined.

@@ -21,8 +21,7 @@ Lemma comm_square_comp
   {h : A -> A'} {g : B -> B'} (comm : f' o h == g o f)
 : f'' o (h' o h) == (g' o g) o f.
 Proof.
-  intros x; unfold compose. path_via (g' (f' (h x))).
-    apply comm'.
+  intros x. path_via (g' (f' (h x))).
   apply ap, comm.
 Defined.
 
@@ -39,8 +38,8 @@ Proof.
   intros a'.
   path_via (wB ^-1 (wB (f (wA ^-1 a')))).
     apply inverse, eissect.
-  unfold compose. apply ap, (concat (wf _)^). 
-  unfold compose. apply ap, eisretr.
+  apply ap, (concat (wf _)^). 
+  apply ap, eisretr.
 Defined.
 
 (* Up to naturality, the result of [comm_square_inverse] really is a

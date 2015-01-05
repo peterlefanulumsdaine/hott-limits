@@ -28,7 +28,7 @@ Section Long_Sequences.
 Record long_sequence := {
   lseq_obs :> nat -> pointed_type;
   lseq_maps : forall n:nat, lseq_obs (1+n) .-> lseq_obs n;
-  lseq_null : forall n:nat, compose_ptd (lseq_maps n) (lseq_maps (1+n)) .== point }.
+  lseq_null : forall n:nat_ptd (lseq_maps n) (lseq_maps (1+n)) .== point }.
 
 Definition lseq_is_hfiber (X : long_sequence)
   := forall n, is_hfiber (lseq_maps X (1+n)) (lseq_maps X n) (lseq_null X n).
@@ -162,14 +162,14 @@ Proof.
     apply mk_ptd_cospan_map with (hfiber_to_pullback_ptd _) (idmap_ptd _) (idmap_ptd _). 
       apply hfiber_to_pullback_ptd_factn.
       apply (concat_ptd_htpy (compose_f1_ptd _)).
-      apply inverse_ptd_htpy, compose_1f_ptd.
+      apply inverse_ptd_htpy_1f_ptd.
   apply @composeR_ptd with (pullback_ptd (pullback_ptd_pr2 name_point f) name_point).
     apply pullback_ptd_fmap.
     apply mk_ptd_cospan_map with (pullback_ptd_symm _ _) (idmap_ptd _) (idmap_ptd _). 
       apply (concat_ptd_htpy (pullback_ptd_symm_pr2 _ _)).
-        apply inverse_ptd_htpy, compose_1f_ptd.
+        apply inverse_ptd_htpy_1f_ptd.
       apply (concat_ptd_htpy (compose_f1_ptd _)).
-      apply inverse_ptd_htpy, compose_1f_ptd.
+      apply inverse_ptd_htpy_1f_ptd.
   apply @composeR_ptd with (pullback_ptd name_point (compose_ptd f name_point)).
     apply (@equiv_inverse_ptd _ _ (outer_to_double_pullback_ptd _ _ _)).
     apply two_pullbacks_isequiv.
@@ -177,7 +177,7 @@ Proof.
     apply pullback_ptd_fmap.
     apply mk_ptd_cospan_map with (idmap_ptd _) (idmap_ptd _) (idmap_ptd _).
       apply (concat_ptd_htpy (compose_f1_ptd _)).
-      apply inverse_ptd_htpy, compose_1f_ptd.
+      apply inverse_ptd_htpy_1f_ptd.
       apply (concat_ptd_htpy (compose_f1_ptd _)).
       apply inverse_ptd_htpy, (concat_ptd_htpy (compose_1f_ptd _)).
       exists (fun _ => pt_map_pt f).     
