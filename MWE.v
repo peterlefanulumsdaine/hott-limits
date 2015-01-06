@@ -7,6 +7,8 @@ Date created: 6 Jan 2014
 *Not a part of the HoTT-Limits library.*  This is a MWE extracted from the 
 HoTT-Limits library, to demo in self-contained form a bug(?) encountered there.
 
+Most of the file is background; the error is at [hfiber_null], the last sentence of the file.  Details of the errors are given there.
+
 Tested over HoTT/HoTT@3500510. 
 *******************************************************************************)
 
@@ -66,24 +68,25 @@ Definition hfiber_pr1_ptd {X Y : pointed_type} (f : X .-> Y)
   : (hfiber_ptd f) .-> X
 := @mk_pointed_map (hfiber_ptd f) X pr1 1.
 
-Definition hfiber_null {X Y : pointed_type@{i}} (f : X .-> Y)
-  : compose_ptd f (hfiber_pr1_ptd f) .== point@{i}
+Definition hfiber_null {X Y : pointed_type} (f : X .-> Y)
+  : compose_ptd f (hfiber_pr1_ptd f) .== point
 := @mk_pointed_htpy _ _
      (compose_ptd f (hfiber_pr1_ptd f))
      point
      (fun xp : hfiber_ptd f => pr2 xp)
      (concat_p1 _ @ concat_1p _)^. 
-(* As given here: errors with
+
+(* Without universe annotations, this definition errors:
  
 > Error: Unsatisfied constraints: […]
 > (maybe a bugged tactic).
 
-If enough universe annotations are given, e.g. if in the *statement* of the definition, we add [pointed_type@{i}] and [point@{i}], then the error changes to 
+If enough universe annotations are given, e.g. if in the statement of the definition, we add [pointed_type@{i}] and [point@{i}], then the error changes to 
 
 > Anomaly: Uncaught exception Invalid_argument("index out of bounds").
 > Please report.
 
-If in the *body* of the definition, [point] is expanded to [ (@point (pointed_map_ptd (hfiber_ptd f) Y)) ], then the definition checks OK.
+If in the body of the definition, [point] is expanded to [ (@point (pointed_map_ptd (hfiber_ptd f) Y)) ], then the definition checks OK.
 *)
 
 (*
