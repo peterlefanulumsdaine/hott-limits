@@ -9,7 +9,7 @@ HoTT-Limits library, to demo in self-contained form a bug(?) encountered there.
 
 Most of the file is background; the error is at [hfiber_null], the last sentence of the file.  Details of the errors are given there.
 
-Tested over HoTT/HoTT@3500510. 
+Produced over HoTT/HoTT@3500510.  Reported at https://coq.inria.fr/bugs/show_bug.cgi?id=3903.
 *******************************************************************************)
 
 Require Import HoTT.
