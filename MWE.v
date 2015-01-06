@@ -5,7 +5,9 @@ Authors: Jeremy Avigad, Chris Kapulkin, Peter LeFanu Lumsdaine
 Date created: 6 Jan 2014
 
 *Not a part of the HoTT-Limits library.*  This is a MWE extracted from the 
-HoTT-Limits library, to demo in self-contained form a bug(?) encountered there. 
+HoTT-Limits library, to demo in self-contained form a bug(?) encountered there.
+
+Tested over HoTT/HoTT@3500510. 
 *******************************************************************************)
 
 Require Import HoTT.
@@ -43,9 +45,9 @@ Notation "f .== g" := (pointed_htpy f g)
 Definition pointed_map_ptd (X Y : pointed_type)
 := mk_pointed_type (X .-> Y)
      {| pt_map := fun _ => point ; pt_map_pt := 1 |}.
-
-Canonical Structure pointed_map_ptd.
  
+Canonical Structure pointed_map_ptd.
+
 Definition compose_ptd {X Y Z} (f : Y .-> Z) (g : X .-> Y)
 := {| pt_map := f o g ; pt_map_pt := (ap f (pt_map_pt g) @ pt_map_pt f) |}.
 
@@ -71,6 +73,18 @@ Definition hfiber_null {X Y : pointed_type@{i}} (f : X .-> Y)
      point
      (fun xp : hfiber_ptd f => pr2 xp)
      (concat_p1 _ @ concat_1p _)^. 
+(* As given here: errors with
+ 
+> Error: Unsatisfied constraints: […]
+> (maybe a bugged tactic).
+
+If enough universe annotations are given, e.g. if in the *statement* of the definition, we add [pointed_type@{i}] and [point@{i}], then the error changes to 
+
+> Anomaly: Uncaught exception Invalid_argument("index out of bounds").
+> Please report.
+
+If in the *body* of the definition, [point] is expanded to [ (@point (pointed_map_ptd (hfiber_ptd f) Y)) ], then the definition checks OK.
+*)
 
 (*
 Local Variables:
