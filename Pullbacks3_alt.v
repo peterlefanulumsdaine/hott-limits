@@ -274,7 +274,7 @@ Proof.
     change ((equiv_inverse e1) ^-1) with (fun x => e1 x).
     unfold e1, abstract_pullback_unique. simpl.
     unfold abstract_pullback_equiv_cospan_cone_1, equiv_composeR'. simpl.
-    rewrite pullback_universal_unlock.
+    (* rewrite pullback_universal_unlock. *)
     exact 1.
   rewrite H. apply (pullback_resp_equiv_A _ _ (equiv_inverse e1)).
 Defined.
@@ -296,13 +296,29 @@ Proof.
       change ((equiv_inverse e1) ^-1) with (fun x => e1 x).
       unfold e1, abstract_pullback_unique,
         abstract_pullback_equiv_cospan_cone_1, equiv_composeR'. simpl.
-      rewrite pullback_universal_unlock.
+      (* rewrite pullback_universal_unlock. *)
       exact 1.
     rewrite H.
     apply (pullback_resp_equiv_A (g ^* f) h (equiv_inverse e1)).
   equiv_via (X -> pullback f (g o h)).
   apply equiv_postcompose'. exact (equiv_inverse (two_pullbacks_equiv f g h)).
   apply (equiv_inverse (cospan_cone_map_to_pullback_equiv _ _ _)).
+Defined.
+
+(*TODO: move *)
+Lemma pullback_path_1 {X Y Z : Type} {ff : X -> Z} {gg : Y -> Z}
+  (u : pullback ff gg)
+: pullback_path u u 1 1 (concat_p1 (1 @ _) @ concat_1p _) = 1.
+Proof.
+  destruct u as [x [y p]].
+  unfold pullback_path, pullback_comm; simpl.
+  refine (@ap _ _ _ _ 1 _).
+  refine (@ap _ _ _ _ 1 _).
+  eapply concat. apply concat_pp_p.
+  refine (whiskerL _ _ @ concat_Vp _).
+  eapply concat. apply concat_p_pp.
+  eapply concat. refine (whiskerR (concat_Vp _) _).
+  apply concat_1p.
 Defined.
 
 Lemma left_cospan_cone_to_composite_UP_equiv_path
@@ -312,95 +328,153 @@ Lemma left_cospan_cone_to_composite_UP_equiv_path
   ==
    map_to_cospan_cone (left_cospan_cone_to_composite P1 P2) X.
 Proof.
-(*
   intros alpha.
-  unfold left_cospan_cone_to_composite_UP_equiv2, left_cospan_cone_to_composite,
-    map_to_cospan_cone.
-  simpl. simpl.
-  unfold pullback_pr2, pullback_pr1. simpl.
-  unfold cospan_cone_map_to_pullback_equiv. simpl.
-  unfold equiv_postcompose'. simpl.
-  unfold equiv_inv. simpl.
-  unfold cospan_cone_map2, cospan_cone_map1,cospan_cone_comm. simpl.
-  unfold cospan_cone_map2, cospan_cone_map1,cospan_cone_comm. simpl.
-  idmap. simpl.
-  set (pg := pr1 P1). set (pf := pr1 (pr2 P1)).
-    set (phi := pr2 (pr2 P1)).
-  set (ph := pr1 P2). set (ppf := pr1 (pr2 P2)).
-    set (psi := pr2 (pr2 P2)).
-  unfold projT1, projT2. simpl.
-  unfold map_to_cospan_cone. simpl.
-  unfold cospan_cone_map2, cospan_cone_comm. simpl.
-  assert (id_elim_lemma :
-    forall (x:X) (b:B1) (q : b = h (ppf (alpha x)))
-      (p : f (pg (ph (alpha x))) = g b),
-    @id_opp_elim B1 (h (ppf (alpha x)))
-      (fun (b : B1) (_ : b = h (ppf (alpha x))) =>
-         f (pg (ph (alpha x))) = g b ->
-         @pullback A B2 C f (fun x0 : B2 => g (h x0)))
-      (fun p : f (pg (ph (alpha x))) = g (h (ppf (alpha x))) =>
-         @mk_pullback A B2 C f (fun x0 : B2 => g (h x0))
-           (pg (ph (alpha x))) (ppf (alpha x)) p)
-      b q p
-   =
-      @mk_pullback A B2 C f (g o h)
+  set (pg := cospan_cone_map1 P1). set (pf := cospan_cone_map2 P1).
+    set (phi := cospan_cone_comm P1).
+  set (ph := cospan_cone_map1 P2). set (ppf := cospan_cone_map2 P2).
+    set (psi := cospan_cone_comm P2).
+
+  change (map_to_cospan_cone (left_cospan_cone_to_composite P1 P2) X alpha)
+    with (map_to_pullback_to_cospan_cone
+      (fun x:X => mk_pullback f (g o h)
         (pg (ph (alpha x)))
         (ppf (alpha x))
-        (p @ ap g q)).
-  assert (id_elim_lemma' :
-    forall (x:X) (b:B1) (q : h (ppf (alpha x)) = b)
-      (p : f (pg (ph (alpha x))) = g b),
-    @id_opp_elim B1 (h (ppf (alpha x)))
-      (fun (b : B1) (_ : b = h (ppf (alpha x))) =>
-         f (pg (ph (alpha x))) = g b ->
-         @pullback A B2 C f (fun x0 : B2 => g (h x0)))
-      (fun p : f (pg (ph (alpha x))) = g (h (ppf (alpha x))) =>
-         @mk_pullback A B2 C f (fun x0 : B2 => g (h x0))
-           (pg (ph (alpha x))) (ppf (alpha x)) p)
-      b (q^) p
-   =
-      @mk_pullback A B2 C f (g o h)
-        (pg (ph (alpha x)))
-        (ppf (alpha x))
-        (p @ ap g (q^))).
-    intros x b q p. destruct q. simpl.
-    unfold id_opp_elim. simpl.
+        (phi (ph (alpha x)) @ ap g (psi (alpha x))))).
+  simpl. 
+  refine (cospan_cone_path _ _ _). 
+  exact 1. exact 1.
+
+  intros x; simpl.
+  apply (concatR (concat_p1 _)^), (concatR (concat_1p _)^). cbn.
+  apply whiskerL. apply ap.
+  unfold CommutativeSquares.comm_square_inverse. cbn.
+  path_via' (1 @ (ap idmap (psi (alpha x)) @ 1)).
+    Focus 2.
+    apply (concat (concat_1p _)), (concat (concat_p1 _)).
+    apply ap_idmap.
+  apply whiskerR.
+  apply (concat (concat_1p _)).
+  refine (@ap _ _ (ap idmap) _ 1 _).
+  apply moveR_Vp.
+  apply (concatR (concat_p1 _)^).
+
+  set (yy := (cospan_cone_map1 P2 (alpha x))).
+  clearbody yy. clear alpha x X.
+  fold pg pf phi ph ppf psi.
+
+  assert (forall P a, @path_forall _ _ P a a
+           (fun x0 : Unit => match x0 with
+                               | tt => 1
+                             end)
+          = 1)
+    as H.
+    intros P a.
+    apply (concatR (path_forall_1 _)). apply ap.
+    apply path_forall. intros []. exact 1.
+  rewrite H. rewrite H. rewrite H. simpl.
+  repeat rewrite concat_1p.
+  repeat rewrite concat_p1.
+
+  (* Next step is really a [change], but it’s easier to write like this. *)
+  refine (concat _ _).
     apply ap.
-    apply inverse. apply concat_p1.
-    (* id_elim_lemma' proven *)
-    intros x b q. rewrite <- (inv_V _ _ _ q).
-    apply id_elim_lemma'.
-    (* id_elim_lemma proven *)
-  path_via
-    (map_to_pullback_to_cospan_cone f (fun x : B2 => g (h x)) X
-    (fun x:X => mk_pullback f (g o h)
-      (pg (ph (alpha x)))
-      (ppf (alpha x))
-      (phi (ph (alpha x)) @ ap g (psi (alpha x))))).
-  apply ap. apply path_forall. intros x.
-  path_via (@id_opp_elim B1 (h (ppf (alpha x)))
-     (fun (b : B1) (_ : b = h (ppf (alpha x))) =>
-      f (pg (ph (alpha x))) = g b ->
-      pullback f (g o h))
-     (fun p : f (pg (ph (alpha x))) = g (h (ppf (alpha x))) =>
-      mk_pullback f (g o h)
-        (pg (ph (alpha x))) (ppf (alpha x)) p) (pf (ph (alpha x)))
-     (psi (alpha x))
-     (phi (ph (alpha x)))).
-  apply (ap (fun q => @id_opp_elim B1 (h (ppf (alpha x)))
-     (fun (b : B1) (_ : b = h (ppf (alpha x))) =>
-      f (pg (ph (alpha x))) = g b ->
-      pullback f (g o h))
-     (fun p : f (pg (ph (alpha x))) = g (h (ppf (alpha x))) =>
-      mk_pullback f (g o h)
-        (pg (ph (alpha x))) (ppf (alpha x)) p) (pf (ph (alpha x)))
-     q
-     (phi (ph (alpha x))))).
-  path_via (ap (fun x0 : B1 => x0) (psi (alpha x))).
-  apply ap_idmap. *)
-Admitted.
-(* This succeeds during proof-building, but fails to pass the [Defined.]
-*)
+    exact (ap10 (eissect (map_to_cospan_cone P1 Unit) (unit_name yy)) tt).
+  exact 1.
+
+  (* Remove a lot of fluff in the RHS *)
+  eapply concatR.
+    apply ap, ap, ap. 
+    refine ((concat_Vp _)^ @ whiskerR _ _).
+    refine (@concat _ _ 1 _ _ _).
+      refine (@ap _ _ inverse _ 1 _).
+      refine (_ @ path_forall_1 _).
+      apply ap, path_forall. intros [].
+      apply pullback_path_1.
+    refine (@ap _ _ _ 1 _ _).
+    refine (@ap _ _ _ 1 _ _).
+    refine (@ap _ _ _ 1 _ _).
+    apply inverse. 
+    refine (_ @ (path_forall_1 _)).
+    apply ap, path_forall. intros [].
+    apply pullback_path_1.
+  eapply concatR.
+    simpl. apply ap. eapply inverse, concat_p1.
+
+  (* Massage the LHS to apply [eisadj] *)
+  set (pp := @eisadj _ _ (map_to_cospan_cone P1 Unit)
+        (pullback_cone_UP _ _) (unit_name yy)).
+  eapply concat. refine ((ap10_ap_postcompose _ _ _)^).
+  set (ap10___tt := fun p => @ap10 _ _
+      (@cospan_cone_map2 A B1 C f g P1 P1
+        o (@equiv_inv _ _ _ (pullback_cone_UP P1 Unit))
+          (@map_to_cospan_cone A B1 C f g (@pullback A B1 C f g)
+            (@pullback_cospan_cone A B1 C f g) Unit
+              (unit_name
+                (@cospan_cone_to_map_to_pullback A B1 C f g Unit
+                   (@map_to_cospan_cone A B1 C f g P1 P1 Unit (unit_name yy))
+                   tt))))
+      (@cospan_cone_map2 A B1 C f g P1 P1 o unit_name yy)
+      p tt).
+  path_via' (ap10___tt
+    (ap cospan_cone_map2
+      (ap (map_to_cospan_cone P1 Unit)
+        (@eissect _ _ _ (pullback_cone_UP _ _) (unit_name yy))))).
+    apply (ap ap10___tt).
+    refine (ap_compose (map_to_cospan_cone P1 Unit) cospan_cone_map2 _).
+  path_via' (ap10___tt
+    (ap cospan_cone_map2
+      (@eisretr _ _ _ (pullback_cone_UP _ _)
+        (map_to_cospan_cone P1 Unit (unit_name yy))))).
+  apply ap, ap. exact (pp^).
+  unfold ap10___tt. clear ap10___tt pp.
+
+  (* Clean up the RHS *)
+  eapply concatR.
+    refine
+      (@ap_compose (@cospan_cone A B1 C f g Unit) (@pullback A B1 C f g) B1
+        (fun x : cospan_cone f g Unit => cospan_cone_to_map_to_pullback x tt)
+        (g ^* f) 
+        (@map_to_cospan_cone A B1 C f g P1 P1 Unit
+          (unit_name
+             ((@map_to_cospan_cone A B1 C f g P1 P1 Unit)^-1
+                (@map_to_cospan_cone A B1 C f g (@pullback A B1 C f g)
+                   (@pullback_cospan_cone A B1 C f g) Unit
+                   (unit_name
+                      (@cospan_cone_to_map_to_pullback A B1 C f g Unit
+                         (@map_to_cospan_cone A B1 C f g P1 P1 Unit
+                            (unit_name yy)) tt))) tt)))
+        (@map_to_cospan_cone A B1 C f g (@pullback A B1 C f g)
+          (@pullback_cospan_cone A B1 C f g) Unit
+          (unit_name
+             (@cospan_cone_to_map_to_pullback A B1 C f g Unit
+                (@map_to_cospan_cone A B1 C f g P1 P1 Unit (unit_name yy)) tt)))
+        _).
+
+  (* Next: try to use naturality of [eisretr]? (i.e. [concat_A1p]) *)
+  pose (eisretr_nat := @concat_A1p _ _
+    (@eisretr _ _ _ (pullback_cone_UP P1 Unit))); clearbody eisretr_nat.
+  set (retr := (@eisretr _ _ _ (pullback_cone_UP P1 Unit)
+         (map_to_cospan_cone P1 Unit (unit_name yy)))).
+  refine (_ @ _).
+    refine (@ap _ _
+             (fun x : cospan_cone f g Unit =>
+               (g ^* f) (cospan_cone_to_map_to_pullback x tt))
+            (map_to_cospan_cone P1 Unit _)
+            (map_to_cospan_cone P1 Unit (unit_name yy))
+            _).
+      exact retr.
+    unfold cospan_cone_to_map_to_pullback, pullback_pr2; simpl.
+    assert (lemma : forall (A B C : Type)
+                           (k : A -> B -> C)
+                           (a a' : A)
+                           (p : a = a')
+                           (b : B),
+                     ap10 (ap k p) b = ap (fun x => k x b) p).
+      intros; destruct p; exact 1.
+    exact (lemma _ _ _ cospan_cone_map2 _ _ retr tt).
+
+  (* It looks like [apply ap] should work next; but [Set Printing Implicit.] shows why it doesn’t! *)
+Abort.
 
 Lemma left_cospan_cone_to_composite_UP_first_version
   (P1 : abstract_pullback f g) (P2 : abstract_pullback (cospan_cone_map2 P1) h)
