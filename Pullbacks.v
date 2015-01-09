@@ -375,14 +375,14 @@ Lemma pullback_universal {A B C : Type} (f : A -> C) (g : B -> C)
 : is_pullback_cone (pullback_cospan_cone f g).
 Proof.
   apply pullback_universal_transparent.
-Qed.
+Defined.
 
 Lemma pullback_universal_unlock
 : @pullback_universal = @pullback_universal_transparent.
 Proof.
   do 5 (apply path_forall; intro). 
   apply hprop_is_pullback_cone.
-Qed.
+Defined.
 
 End Pullback_UP.
 
@@ -803,7 +803,7 @@ Proof.
     apply ap10. apply ap.
     apply cospan_inverse_is_retraction.
   apply pullback_fmap_id.
-Qed.
+Defined.
 
 Lemma pullback_fmap_equiv
   {A B C : Type} (f : A -> C) (g : B -> C)
@@ -975,7 +975,7 @@ Proof.
   apply pullback_path'. exists 1, 1. simpl.
   apply (concat (concat_p1 _)), (concat (concat_1p _)).
   apply concat_p1.
-Qed.
+Defined.
 
 Definition two_pullbacks_equiv
   : (pullback f (g o h)) <~> (pullback (g ^* f) h)
