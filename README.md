@@ -31,7 +31,7 @@ If `hoqc` is not in your system path, you will need to pass its location explici
 
     make COQC=/path/to/hoqc
 
-By default, `make` omits the files `Pullbacks3.v` (slow to compile) and `Pullbacks3_alt.v` (extremely slow).  To include these, run `make twopullbacks`, `make twopullbacksalt`, or `make all`.
+By default, `make` omits the files `Pullbacks3.v` (slow to compile) and `Pullbacks3_alt.v` (extremely slow).  To include these, run `make all`.
 
 # Organization #
 
@@ -49,12 +49,16 @@ The files in the library are as follows:
 
 # Versions and compatibility #
 
-These files are written for the customised version of Coq 8.4 included with the HoTT library.
+We aim to keep this development compatible with the latest version of the HoTT library.  Most recently, our revision c95e721 has been tested using HoTT revision 3500510:
 
-We aim to keep this development compatible with the latest version of the HoTT library.  Specifically, our revision eed93f2 has been tested using HoTT revision 2abb906:
+  https://github.com/HoTT/HoTT/commit/3500510
 
-  https://github.com/HoTT/HoTT/commit/2abb906
-  
+To check out a specific version of this or the HoTT repo, run
+
+    git checkout 1234abc
+
+from within your local clone of the repository, where `1234abc` is the (abridged) hash of the desired commit, or the name of the desired branch.
+
 This development may evolve in the future. The latest version can always be found at:
 
   https://github.com/peterlefanulumsdaine/hott-limits
