@@ -239,12 +239,12 @@ Proof.
   (* is_section *)
   intros y. simpl.
   path_via (h ( g ((h o g) ^-1 y))).
-    apply ap. apply (eisretr (g o f)).
+    apply (ap h). apply (eisretr (g o f)).
     apply (eisretr (h o g)).
   (* is_retraction *)
   intros x. simpl.
   path_via ((g o f) ^-1 (g (f x))).
-    repeat apply ap. apply (eissect (h o g)).
+    apply (ap (g o f)^-1), (ap g). apply (eissect (h o g)).
     apply (eissect (g o f)).
 Qed.
 
@@ -259,7 +259,7 @@ Proof.
   intros z.
   path_via ((g o (h o g) ^-1) (h (g (f ((g o f)^-1 z))))).
     set (ghgi := g o (h o g)^-1).
-    apply ap, ap, ap, inverse, (eisretr (g o f)).
+    apply (ap ghgi), (ap h), inverse, (eisretr (g o f)).
   path_via (g (f ((g o f)^-1 z))).
     apply (ap g), (eissect (h o g)).
   apply (eisretr (g o f)).
@@ -269,7 +269,7 @@ Lemma two_of_six_g {X Y Z W : Type} (f: X -> Y) (g: Y -> Z) (h: Z -> W)
 : IsEquiv (h o g) -> IsEquiv (g o f) -> IsEquiv g.
 Proof.
   intros hg_iseq gf_iseq.
-  apply isequiv_biinv; split.
+  apply equiv_biinv; split.
   (* left inverse*) exists ((h o g)^-1 o h). apply eissect.
   (* right inverse*) exists (f o (g o f)^-1). apply (eisretr (g o f)).
 Qed.
