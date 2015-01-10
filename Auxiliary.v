@@ -48,20 +48,6 @@ Proof.
 Defined.
 (* Note: this proof, while clean, is proof-theoretically overkill — it requires a universe, since inspecting it carefully, it Id-eliminates into a Pi-type with large domain (since P has to be generalized).  With a little more work, it can be proved more economically, using just pure M-L TT. *)
  
-Definition total_path' {X : Type} {P : X -> Type} {s s' : {x:X & P x}}
-: { p : pr1 s = pr1 s' & p # pr2 s = pr2 s' } -> s = s'.
-Proof.
-  intros [p q]. apply (total_path p q).
-Defined.
-
-Definition total_path_pr1 {A : Type} {P : A -> Type} {x y: {a : A & P a}}
-  (p : pr1 x = pr1 y) (q : transport P p (pr2 x) = pr2 y)
-: base_path (total_path p q) = p.
-Proof.
-  destruct x as [x1 x2], y as [y1 y2]. simpl in *.
-  destruct p, q; simpl. exact 1.
-Defined.
-
 Definition path_space (A : Type) := { x:A & { y:A & x = y }}.
 
 (* Useful mainly for the idiom [apply (concatR (expression))]. *)
@@ -251,8 +237,7 @@ Lemma isequiv_hfiber_incl_over_hprop {Y X : Type} (X_hprop : IsHProp X)
   (f : Y -> X) (x:X)
 : IsEquiv (hfiber_incl f x).
 Proof.
-  apply isequiv_sigma_contr.
-  intros y. apply X_hprop.
+  refine (isequiv_sigma_contr _).
 Defined.
 
 End Varia.

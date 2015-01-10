@@ -8,11 +8,11 @@ More on limits, following Limits.v
 
 *******************************************************************************)
 
-Require Import HoTT.
+Require Import HoTT.HoTT.
 
 Require Import Arith.
 
-Require Import Auxiliary Equalizers Limits Pullbacks.
+Require Import Auxiliary Equalizers Limits1 Pullbacks.
 
 
 (*******************************************************************************
@@ -230,7 +230,7 @@ Proof.
   rewrite concat_Vp.
   apply inverse; apply concat_p1.
   (* is_retraction *)
-  intros [a p]. apply total_path'.
+  intros [a p]. apply path_sigma_uncurried.
   exists 1. simpl.
   apply (concat_1p _ @ inv_V _).
 Defined.

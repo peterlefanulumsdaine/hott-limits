@@ -371,7 +371,7 @@ Defined.
 
 Theorem nat_is_hset : IsHSet nat.
 Proof.
-  apply hset_decidable. unfold decidable_paths. apply eq_dec_nat.
+  apply hset_decpaths. unfold DecidablePaths. apply eq_dec_nat.
 Defined.
 
 Definition nat_HSet : HSet

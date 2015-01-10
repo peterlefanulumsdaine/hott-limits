@@ -27,8 +27,10 @@ Section Long_Sequences.
 
 Record long_sequence := {
   lseq_obs :> nat -> pointed_type;
-  lseq_maps : forall n:nat, lseq_obs (1+n) .-> lseq_obs n;
-  lseq_null : forall n:nat, compose_ptd (lseq_maps n) (lseq_maps (1+n)) .== point }.
+  lseq_maps : forall n:nat, lseq_obs (1+n) .-> lseq_obs n ;
+  lseq_null : forall n:nat,
+    compose_ptd (lseq_maps n) (lseq_maps (1+n))
+    .== (@point (pointed_map_ptd (lseq_obs (2+n)) (lseq_obs n)))}.
 
 Definition lseq_is_hfiber (X : long_sequence)
   := forall n, is_hfiber (lseq_maps X (1+n)) (lseq_maps X n) (lseq_null X n).
@@ -53,7 +55,8 @@ Hypothesis template_iterator_map : forall A B (f : B .-> A),
   (template_iterator_dom f) .-> B.
 Arguments template_iterator_map [A B] f.
 Hypothesis template_iterator_null : forall A B (f : B .-> A),
-  compose_ptd f (template_iterator_map f) .== point.
+  compose_ptd f (template_iterator_map f)
+  .== (@point (pointed_map_ptd _ _)).
 Arguments template_iterator_null [A B] f.
 
 Definition lseq_template_aux (n:nat) : { A:pointed_type & {B : pointed_type & B .-> A}}.
@@ -116,9 +119,12 @@ Lemma hfiber_sequence_shift_aux {A B} (f : B .-> A) (n:nat)
 Proof.
   induction n as [ | n' IH].
   (* n = 0 *) simpl; exact 1.
-  (* n = 1+n' *) exact (ap (fun ABf =>
-    (pr1 (pr2 ABf); (hfiber_ptd (pr2 (pr2 ABf));
-      hfiber_incl_ptd (pr2 (pr2 ABf))))) IH).
+  exact (@ap { A:pointed_type & {B : pointed_type & B .-> A}}
+             { A:pointed_type & {B : pointed_type & B .-> A}}
+             (fun ABf =>
+               (pr1 (pr2 ABf); (hfiber_ptd (pr2 (pr2 ABf));
+                 hfiber_incl_ptd (pr2 (pr2 ABf))))) 
+             _ _ IH).
 Defined.
 
 Lemma hfiber_sequence_shift {A B} (f : B .-> A) (n:nat)
@@ -172,7 +178,7 @@ Proof.
       apply inverse_ptd_htpy, compose_1f_ptd.
   apply @composeR_ptd with (pullback_ptd name_point (compose_ptd f name_point)).
     apply (@equiv_inverse_ptd _ _ (outer_to_double_pullback_ptd _ _ _)).
-    apply two_pullbacks_isequiv.
+    refine (two_pullbacks_isequiv name_point f name_point).
   apply @composeR_ptd with (pullback_ptd (@name_point X) name_point).
     apply pullback_ptd_fmap.
     apply mk_ptd_cospan_map with (idmap_ptd _) (idmap_ptd _) (idmap_ptd _).
@@ -262,6 +268,47 @@ Proof.
   apply isequiv_compose_ptd.
     apply isequiv_Omega_to_hfiber_seq_1.
   exact _. (* [equiv_isequiv equiv_path] found automagically. *)
+Qed.
+
+(*******************************************************************************
+
+An alternative construction of the [hiber_to_Omega] equivalence, this time by
+hand instead of via pullbacks.  Though elementary, this is not quite as
+straightforward as one might expect.
+
+*******************************************************************************)
+
+Lemma hfiber_to_Omega_by_hand {X Y : pointed_type} (f:Y.->X)
+: (hfiber_ptd (hfiber_incl_ptd f)) .-> Omega_ptd X.
+Proof.
+  exists (fun y1_p_q : (hfiber_ptd (hfiber_incl_ptd f)) =>
+    match y1_p_q with ((y1;p);q) => ((pt_map_pt f)^ @ (ap f q)^ @ p) end).
+  simpl. exact (whiskerR (concat_p1 _) _ @ concat_Vp _).
+Defined.
+
+Lemma isequiv_hfiber_to_Omega_by_hand {X Y : pointed_type} (f:Y.->X)
+: IsEquiv (hfiber_to_Omega_by_hand f).
+Proof.
+  refine (isequiv_adjointify (fun p => ((point; pt_map_pt f @ p); 1)) _ _).
+  (* section *) intro p; simpl.
+  apply (concat (whiskerR (concat_p1 _) _)).
+  apply concat_V_pp.
+  (* retraction *) intros [[y1 p] q]. simpl in *.
+  revert y1 q p.
+  refine (@id_opp_elim Y point _ _).
+  intro p; simpl.
+  assert (pt_map_pt f @ (((pt_map_pt f) ^ @ 1) @ p) = p) as H.
+    apply (concat (whiskerL _ (whiskerR (concat_p1 _) _))).
+    apply concat_p_Vp.
+  apply path_sigma_uncurried. simpl.
+  set (pp := @path_sigma _ (fun y => f y = point) (point; pt_map_pt f @ (((pt_map_pt f) ^ @ 1) @ p)) (point;p) 1 H).
+  exists pp.
+  apply (concat (transport_compose (fun (y:Y) => y = point) (hfiber_incl f point) pp _)).
+  apply (concat (transport_paths_l _ _)).
+  apply (concat (concat_p1 _)).
+  refine (@ap _ _ inverse _ 1 _).
+  refine (@pr1_path_sigma _ _
+    (point; pt_map_pt f @ (((pt_map_pt f) ^ @ 1) @ p)) (point; p) 1 H).
 Qed.
 
 (*

@@ -1,52 +1,37 @@
 # Fibration categories project makefile.
-# Jeremy Avigad, Chris Kapulkin, Peter LeFanu Lumsdaine, 2012.
+# Jeremy Avigad, Chris Kapulkin, Peter LeFanu Lumsdaine, 2012 and onwards.
 
-# The modules to be compiled by default.  
-# For these, just call “make” at the commandline.
-# For now, includes everything that compiles successfully and in reasonable time; happily, this also includes everything required as a dependency by other files.
-default: limits sequences
+# Quick usage: “make” to build core of library, “make all” for all modules.
 
-# All modules (invoked by “make all”).
-all: auxiliary arith fundamentals limits-common pullbacks limits pointedtypes sequences twopullbacks twopullbacksalt
+# Based on example given by Adam Chlipala, in “Theorem Proving in the Large”,
+# section “Build Patterns”. http://adam.chlipala.net/cpdt/html/Large.html
 
-# Command to be used for compiling coq files.
-# Change this locally if eg “hoqc” doesn’t resolve correctly on your system.
-COQC=hoqc
+# Modules to be compiled by default, in plain “make”.
+# Includes everything that compiles successfully in reasonable time.
+MODULES-CORE := Auxiliary Arith Fundamentals CommutativeSquares Equalizers \
+	Pullbacks Pullbacks2 Pullbacks3 Limits1 Limits2 \
+	PointedTypes LongExactSequences
 
-# Specific files involved in each submodule: 
-auxiliary:
-	$(COQC) Auxiliary.v
+# Remaining modules, included only in “make all”.
+MODULES-EXTRA := Pullbacks3_alt
 
-arith: auxiliary
-	$(COQC) Arith.v
+VS-CORE  := $(MODULES-CORE:%=%.v)
+VS-EXTRA := $(MODULES-EXTRA:%=%.v)
 
-fundamentals: auxiliary
-	$(COQC) Fundamentals.v
+.PHONY: core clean
 
-limits-common: fundamentals
-	$(COQC) CommutativeSquares.v
-	$(COQC) Equalizers.v
+core: Makefile.coq
+	$(MAKE) -f Makefile.coq 
 
-pullbacks: limits-common
-	$(COQC) Pullbacks.v
-	$(COQC) Pullbacks2.v
+Makefile.coq: Makefile $(VS-CORE)
+	coq_makefile -R . "" $(VS-CORE) -o Makefile.coq COQC = hoqc COQDEP = hoqdep
 
-twopullbacks: pullbacks
-	$(COQC) Pullbacks3.v
+all: Makefile_all.coq
+	$(MAKE) -f Makefile_all.coq 
 
-twopullbacksalt: pullbacks
-	$(COQC) Pullbacks3_alt.v
+Makefile_all.coq: Makefile $(VS-CORE) $(VS-EXTRA)
+	coq_makefile -R . "" $(VS-CORE) $(VS-EXTRA) -o Makefile_all.coq COQC = hoqc COQDEP = hoqdep
 
-limits: limits-common arith pullbacks
-	$(COQC) Limits.v
-	$(COQC) Limits2.v
-
-pointedtypes: pullbacks
-	$(COQC) PointedTypes.v
-
-sequences: pullbacks pointedtypes
-	$(COQC) LongExactSequences.v
-
-# Call “make clean” to remove all compiled files:
-clean:
-	rm -rf *.vo *.glob
+clean:: Makefile-core.coq
+	$(MAKE) -f Makefile.coq clean
+	rm -f Makefile-core.coq

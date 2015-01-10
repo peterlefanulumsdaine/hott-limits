@@ -6,6 +6,7 @@ Date: 1 March 2013
 
 Defines pointed types, and some key constructions thereon.
 
+NOTE: currently, the use of Canonical Structures to give points of types seems to cause issues, as per Coq bug 3903.  The problem manifests sometimes as an [Unsatisfied Constraints] universe error, and sometimes as [Anomaly: Uncaught exception Invalid_argument("index out of bounds")].  The workaround is to explicitly specify the pointed types, so that the canonical structure is not getting invoked.  See e.g. [Omega_to_pullback_ptd] for a simple example: [Omega_ptd] and [pullback_ptd] both need to be given explicitly, not inferred.
 *******************************************************************************)
 
 Require Import HoTT.
@@ -149,7 +150,7 @@ Definition equiv_inverse_ptd {A B} (f : A .-> B) {f_iseq : IsEquiv f}
   : B .-> A.
 Proof.
   exists (f ^-1).
-  apply equiv_inj.
+  apply (equiv_inj f).
   exact (eisretr _ _ @ (pt_map_pt f)^).
 Defined.
 
@@ -160,8 +161,8 @@ is always pointed. *)
 Lemma equiv_path_ptd {X Y : pointed_type} (p : X = Y)
   : X .-> Y.
 Proof.
-  exists (equiv_path X Y (ap pt_type p)); simpl. 
-  refine ((transport_compose _ _ _ _)^ @ _).
+  exists (equiv_path X Y (ap pt_type p)); simpl.
+  eapply concat. eapply inverse, transport_idmap_ap.
   apply apD.
 Defined.
 
@@ -181,6 +182,12 @@ Definition Unit_ptd : pointed_type
 
 Canonical Structure Unit_ptd.
 
+Definition nat_ptd : pointed_type
+:= {| pt_type := nat;
+      point := 0 |}.
+
+Canonical Structure nat_ptd.
+
 Definition name_point {X : pointed_type} : Unit_ptd .-> X
   := [ defpointed (name point) ].
 
@@ -196,11 +203,12 @@ Definition hfiber_incl_ptd {X Y : pointed_type} (f : X .-> Y)
 := @mk_pointed_map (hfiber_ptd f) X (hfiber_incl f point) 1.
 
 Definition hfiber_null {X Y : pointed_type} (f : X .-> Y)
-  : compose_ptd f (hfiber_incl_ptd f) .== point.
-Proof.
-  exists (fun xp => pr2 xp); simpl.
-  apply inverse. exact (concat_p1 _ @ concat_1p _).
-Defined.
+  : compose_ptd f (hfiber_incl_ptd f) .== point
+:= @mk_pointed_htpy _ _ 
+     (compose_ptd f (hfiber_incl_ptd f))
+     (@point (pointed_map_ptd _ _))
+     (fun xp : hfiber_ptd f => pr2 xp)
+     (concat_p1 _ @ concat_1p _)^. 
 
 End Pointed_Types_Examples.
 
@@ -319,8 +327,7 @@ Definition outer_to_double_pullback_ptd {A B1 B2 C}
 Proof.
   exists (outer_to_double_pullback f g h).
   apply pullback_path'. 
-    assert ((1 @ (pt_map_pt f @ (ap g (pt_map_pt h) @ pt_map_pt g) ^))
-            @ ap g (pt_map_pt h)
+    assert ((1 @ (pt_map_pt f @ (ap g (pt_map_pt h) @ pt_map_pt g) ^)) @ ap g (pt_map_pt h)
              = pt_map_pt f @ (pt_map_pt g) ^) as H.
       apply moveR_pM.
       apply (concat (concat_1p _)).
@@ -332,7 +339,8 @@ Proof.
       1 (pt_map_pt h) H).
     exists 1.
   path_via' ((pt_map_pt h)^
-     @ pullback_comm (outer_to_double_pullback f g h point)
+     @ pullback_comm (outer_to_double_pullback f g h
+         (@point (pullback_ptd _ (compose_ptd _ _))))
      @ 1).
     apply whiskerR, whiskerR, ap.
     apply pullback_path_pr2.
@@ -360,7 +368,9 @@ Proof.
   apply inverse, moveR_pV.
   change (1 @ pt_map_pt (pullback_ptd_pr2 f g)) with (@idpath _ (@point B)).
   apply (concat (concat_p1 _)); simpl.
-  apply (pullback_path'_pr1 (pullback_symm f g point) point).
+  apply (pullback_path'_pr1
+    (pullback_symm f g (@point (pullback_ptd f g)))
+    (@point (pullback_ptd g f))).
 Defined.
 
 Definition pullback_ptd_symm_pr2 {A B C} (f : A .-> C) (g : B .-> C)
@@ -372,7 +382,9 @@ Proof.
   apply inverse, moveR_pV.
   change (1 @ pt_map_pt (pullback_ptd_pr1 f g)) with (@idpath _ (@point A)).
   apply (concat (concat_p1 _)); simpl.
-  apply (pullback_path'_pr2 (pullback_symm f g point) point).
+  apply (pullback_path'_pr2
+    (pullback_symm f g (@point (pullback_ptd f g)))
+    (@point (pullback_ptd g f))).
 Defined.
 
 End Pointed_Pullbacks.
@@ -397,7 +409,7 @@ Definition Omega_ptd_fmap {A B : pointed_type} (f : A .-> B)
 : (Omega_ptd A) .-> (Omega_ptd B).
 Proof.
   exists (Omega_conj (pt_map_pt f) o Omega_fmap point f).
-  unfold Omega_conj, compose, concatR; simpl.
+  unfold Omega_conj, concatR; simpl.
   path_via ((pt_map_pt f)^ @ pt_map_pt f).
   apply whiskerR, concat_p1.
   apply concat_Vp.
@@ -405,7 +417,10 @@ Defined.
 
 Definition Omega_to_pullback_ptd (A : pointed_type)
   : Omega_ptd A .-> pullback_ptd (@name_point A) (name_point)
-:= [defpointed Omega_to_pullback].
+:= @mk_pointed_map
+  (Omega_ptd A)
+  (pullback_ptd (@name_point A) name_point)
+  (Omega_to_pullback) 1.
 
 Instance isequiv_Omega_ptd_fmap {A B : pointed_type} (f : A .-> B)
   : IsEquiv f -> IsEquiv (Omega_ptd_fmap f).
@@ -434,11 +449,12 @@ Section Exactness.
 (* If [Z -g-> Y -f-> X] are pointed maps, a (pointed) nullhomotopy of the
 composite induces a factorisation of [g] through the fiber of [f].  *)
 Definition hfiber_factorisation {Z Y X}
-  (g : Z .-> Y) (f : Y .-> X) (H : compose_ptd f g .== point)
+  (g : Z .-> Y) (f : Y .-> X)
+  (H : compose_ptd f g .== @point (pointed_map_ptd Z X))
 : Z .-> (hfiber_ptd f).
 Proof.
   exists (fun z => ((g z); (pt_htpy H) z)).
-  apply total_path'; simpl.
+  apply path_sigma_uncurried; simpl.
     exists (pt_map_pt g).
   path_via ((ap f (pt_map_pt g))^ @ (pt_htpy H) point).
     refine ((transport_compose (fun x => (x = point)) _ _ _) @ _).

@@ -94,11 +94,11 @@ Proof.
   apply (isequiv_adjointify (str_pullback_along_fib_inv B f)).
   (* is_section *)
   intros [a b]; simpl.
-  apply total_path'. exists (eisretr f a); simpl.
+  apply path_sigma_uncurried. exists (eisretr f a); simpl.
   apply transport_pV.
   (* is_retraction *)
   intros [c b]. simpl.
-  apply total_path'. simpl. exists (eissect f c).
+  apply path_sigma_uncurried. simpl. exists (eissect f c).
   apply (concat (transport_compose B f _ _)).
   apply (concat (transport_pp _ _ _ b)^).
   apply (@ap _ _ (fun p => p # b) _ 1).
@@ -215,11 +215,11 @@ Definition equiv_two_of_three_composite {X Y Z : Type} (f: X -> Y) (g: Y -> Z)
 
 Definition equiv_two_of_three_left {X Y Z : Type} (f: X -> Y) (g: Y -> Z)
   : IsEquiv f -> IsEquiv (g o f) -> IsEquiv g
-:= (fun _ _ => Equivalences.cancelR_isequiv g).
+:= (fun _ _ => Equivalences.cancelR_isequiv f).
 
 Definition equiv_two_of_three_right {X Y Z : Type} (f: X -> Y) (g: Y -> Z)
   : IsEquiv g -> IsEquiv (g o f) -> IsEquiv f
-:= (fun _ _ => Equivalences.cancelL_isequiv f).
+:= (fun _ _ => Equivalences.cancelL_isequiv g).
 
 (*******************************************************************************
 2 out of 6: a strengthening of the 2 out of 3 property,
@@ -233,12 +233,12 @@ Proof.
   intros hg_iseq gf_iseq.
   apply isequiv_adjointify with ((g o f) ^-1 o g o (h o g) ^-1).
   (* is_section *)
-  intros y. unfold compose; simpl.
+  intros y. simpl.
   path_via (h ( g ((h o g) ^-1 y))).
     apply ap. apply (eisretr (g o f)).
     apply (eisretr (h o g)).
   (* is_retraction *)
-  intros x. unfold compose; simpl.
+  intros x. simpl.
   path_via ((g o f) ^-1 (g (f x))).
     repeat apply ap. apply (eissect (h o g)).
     apply (eissect (g o f)).
@@ -254,7 +254,8 @@ Proof.
   (* is_retraction *)
   intros z.
   path_via ((g o (h o g) ^-1) (h (g (f ((g o f)^-1 z))))).
-    apply ap, ap, inverse, (eisretr (g o f)).
+    set (ghgi := g o (h o g)^-1).
+    apply ap, ap, ap, inverse, (eisretr (g o f)).
   path_via (g (f ((g o f)^-1 z))).
     apply (ap g), (eissect (h o g)).
   apply (eisretr (g o f)).
@@ -264,7 +265,7 @@ Lemma two_of_six_g {X Y Z W : Type} (f: X -> Y) (g: Y -> Z) (h: Z -> W)
 : IsEquiv (h o g) -> IsEquiv (g o f) -> IsEquiv g.
 Proof.
   intros hg_iseq gf_iseq.
-  apply equiv_biinv; split.
+  apply isequiv_biinv; split.
   (* left inverse*) exists ((h o g)^-1 o h). apply eissect.
   (* right inverse*) exists (f o (g o f)^-1). apply (eisretr (g o f)).
 Qed.

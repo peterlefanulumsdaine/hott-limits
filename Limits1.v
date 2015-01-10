@@ -92,7 +92,7 @@ Proof.
   intros alpha.
   set (alpha1 := pr1 alpha).
   set (alpha2 := pr2 alpha).
-  apply (total_path (path_forall alpha1)).
+  apply path_sigma with (path_forall alpha1).
   assert (transport_lemma
     : forall (p : pr1 x = pr1 y), p # pr2 x =
         (fun (i j:G) (f : G i j)
@@ -213,7 +213,7 @@ Definition limit_graph_cone (D : diagram G)
 : graph_cone D (limit D).
 Proof.
   exists (fun i x => x i).
-  intros i j f x. unfold compose; simpl. exact (lim_pr2 x f).
+  intros i j f x. simpl. exact (lim_pr2 x f).
 Defined.
 
 Definition map_to_limit_to_graph_cone {D : diagram G} {X : Type}
@@ -292,11 +292,14 @@ Proof.
            (equiv_compose e2
            (equiv_compose e1
                           (well_pointedness L)))).
+  (* Something (?typeclass resolution) is very slow here! *)
   assert (H : e == inv_map_to_limit_to_graph_cone C).
     intros x. apply limit_homot_to_path. unfold limit_homot.
     exists (fun i => 1). simpl.
     intros i j g. exact (concat_1p _ @ (concat_p1 _)^).
-  apply (isequiv_homotopic _ _ H).
+  refine (@isequiv_homotopic _ _ _ _ (equiv_isequiv e) H).
+  (* Without giving [equiv_isequiv e], typeclass resolution seems to get stuck!
+     Why? *)
 Defined.
 
 End Limit_UP'.
@@ -541,10 +544,10 @@ Proof.
   intros i j f.
   rewrite concat_p1.
   unfold comm_square_comp.
-  rewrite ap_compose.
+  rewrite (ap_compose (m1_obj j) (m2_obj j)).
   rewrite ap_pp.
   apply (concat (concat_1p _)).
-  apply concat_p_pp.
+    apply concat_p_pp.
 Defined.
 
 End Limit_Functoriality.
@@ -617,7 +620,7 @@ Definition lim_as_eq_cone (D : diagram G)
 Proof.
   unfold graph_cone.
   exists (fun i x => (pr1 x) i).
-  intros i j f x. unfold compose.
+  intros i j f x.
   set (x2 := pr2 x). simpl in x2.
   apply (ap10 (apD10 (apD10 x2 i) j) f).
 Defined.
@@ -665,7 +668,7 @@ Proof.
 
   (* is_retraction *)
   intros [x0 x1].
-  apply total_path'. simpl.
+  apply path_sigma_uncurried. simpl.
   exists 1. simpl.
   path_via (path_forall (fun i : G =>
              (path_forall (fun j : G =>

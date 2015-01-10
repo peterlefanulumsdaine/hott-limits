@@ -164,8 +164,8 @@ Proof.
   intros [a [b pq]]. simpl.
   (* Note: would be lovely if we had a tactic here that would
      let us “destruct pq”. *)
-  apply total_path'. exists 1. simpl.
-  apply total_path'. simpl. exists (ap snd pq).
+  apply path_sigma_uncurried. exists 1. simpl.
+  apply path_sigma_uncurried. simpl. exists (ap snd pq).
   (* transport lemma *)
   assert (forall (b1 b2 : B) (e:b1 = b2)
        (pq : (f a, g a) = Delta b1),
@@ -188,7 +188,7 @@ Proof.
   rewrite concat_1p. apply eta_path_prod.
   (* is_retraction *)
   intros [a p]. simpl.
-  apply total_path'. exists 1. simpl.
+  apply path_sigma_uncurried. exists 1. simpl.
   unfold Delta.
   unfold path_prod'.  rewrite ap_fst_path_prod. rewrite ap_snd_path_prod.
   simpl. apply concat_p1.
@@ -281,6 +281,7 @@ Proof.
 Defined.
 
 End Stable_properties.
+
 
 (*
 Local Variables:

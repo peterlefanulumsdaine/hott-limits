@@ -135,7 +135,7 @@ Lemma left_cospan_cone_aux1 (P1 : abstract_pullback f g)
 Proof.
   apply moveR_I. apply left_cospan_cone_aux0.
 Defined.
-
+ 
 Lemma left_cospan_cone_aux2 (P1 : abstract_pullback f g)
   {X : Type} (C2 : cospan_cone (cospan_cone_map2 P1) h X) (x:X)
   (C1' := @mk_cospan_cone _ _ _ f g _ _ _
@@ -145,7 +145,7 @@ Lemma left_cospan_cone_aux2 (P1 : abstract_pullback f g)
     @ (cospan_cone_comm C2 x)^).
 Proof.
   set (P1_UP_at_X := BuildEquiv (pullback_cone_UP P1 X)).
-  rewrite ap_ap10.  
+  rewrite <- ap10_ap_postcompose.  
   change ((fun f' : X -> P1 => cospan_cone_map2 P1 o f'))
     with (cospan_cone_map2 o P1_UP_at_X).
   rewrite ap_compose.
@@ -215,11 +215,17 @@ Proof.
   apply left_cospan_cone_to_composite_isequiv.
   (* <- *)
   intros C3_UP X.
-  apply (@cancelL_isequiv _ _ (left_cospan_cone_to_composite P1)
-    (left_cospan_cone_to_composite_isequiv _ _) _ (map_to_cospan_cone C2 X)).
+  refine (cancelL_isequiv (left_cospan_cone_to_composite P1)).
+  apply left_cospan_cone_to_composite_isequiv.
   change (left_cospan_cone_to_composite P1 o (map_to_cospan_cone C2 X))
   with (map_to_cospan_cone (left_cospan_cone_to_composite P1 C2) X).
   apply C3_UP.
 Qed.
 
 End Abstract_Two_Pullbacks_Lemma.
+
+(*
+Local Variables:
+coq-prog-name: "hoqtop"
+End:
+*)
